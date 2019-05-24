@@ -19,28 +19,16 @@ const userSchema = new Schema({
   }
 });
 
-// userSchema.static.findByLogin = async function (login) {
-//   let user = await this.findOne({
-//     nickname: login,
-//   });
-
-//   return user;
-// };
-
 const User = mongoose.model("User", userSchema);
 
-// app.use(express.static(__dirname + '/public'));
+app.set('port', (process.env.PORT || 5000));
 
 mongoose.connect('mongodb+srv://root:root@cinemacluster-fmgmj.mongodb.net/test?retryWrites=true', {useNewUrlParser: true, dbName: 'CinemaDb'}, err => {
  if (err) {
   return console.log(err);
  }
- app.listen(process.env.PORT, () => {
+ app.listen(app.get('port'), () => {
    console.log(`Server is awaiting connection...`);
-
-  //  mongoose.connection.db.listCollections().toArray(function (err, names) {
-  //   console.log(names); // [{ name: 'dbname.myCollection' }]
-  // });
  });
 });
 
