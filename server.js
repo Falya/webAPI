@@ -40,12 +40,14 @@ app.use(function (req, res, next) {
 
 app.get('/api/users/', (req, res) => {
   const { name, password } = req.query;
+  const ip = req.connection.remoteAddress;
   console.log(req.query);
   User.find({nickname: name}, (err, user) => {
     if(err) {
       return console.log(err);
     }
     console.log(user);
+    res.setHeader('Access-Control-Allow-Origin', ip);
     res.send('200');
   });
 });
