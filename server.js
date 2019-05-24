@@ -35,7 +35,7 @@ mongoose.connect('mongodb+srv://root:root@cinemacluster-fmgmj.mongodb.net/test?r
  if (err) {
   return console.log(err);
  }
- app.listen(3000, () => {
+ app.listen(process.env.PORT, () => {
    console.log(`Server is awaiting connection...`);
 
   //  mongoose.connection.db.listCollections().toArray(function (err, names) {
