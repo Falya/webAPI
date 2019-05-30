@@ -5,10 +5,13 @@ const movieSchema = new Schema({
   name: {
     type: String,
   },
-  genre:{
+  genre:[{
     type: String,
-  },
+  }],
   age: {
+    type: Number,
+  },
+  duration: {
     type: Number,
   },
   start_date: {
@@ -20,7 +23,7 @@ const movieSchema = new Schema({
   description: {
     type: String,
   },
-  language: {
+  language: {F
     type: String,
   },
   poster: {
@@ -28,6 +31,6 @@ const movieSchema = new Schema({
   }
 });
 
-const Movie = mongoose.model("Movies", movieSchema);
+const Movie = mongoose.model("movies", movieSchema);
 
 module.exports = Movie;

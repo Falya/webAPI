@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const express = require('express');
 const User = require('./src/models/User');
 const Movie = require('./src/models/Movie');
+const { addMovieTheater, addSeance } = require('./src/methods/adminMethods');
+const { getMovieSeance } = require('./src/methods/clientMethods')
 const app = express();
 const jsonParser = express.json();
 
@@ -25,19 +27,9 @@ app.use(function (req, res, next) {
 });
 
 
-app.get('/api/users/', (req, res) => {
-  const { name, password } = req.query;
 
-  User.find({nickname: name}, (err, user) => {
-    if(err) {
-      return console.log(err);
-    }
-    res.send('200');
-  });
-});
 
 app.get('/api/movies',(req, res) => {
-  console.log(req.ip);
   Movie.find({}, (err, movies) => {
     if(err) {
       return console.log(err);
@@ -45,3 +37,28 @@ app.get('/api/movies',(req, res) => {
     res.send(movies);
   })
 });
+
+app.get('/api/movies/movie/seances/:id', (req, res) => {
+   getMovieSeance(req.params.id)
+    .then(data => {
+      // console.log(data);
+      res.send(data);
+    })
+    .catch(err => console.log(err));
+});
+
+
+/**Some querys for create testing */
+app.get('/api/test-create/theater', (req, res) => {
+const {theater} = require('./forTest/testTheater')
+  addMovieTheater(theater)
+    .then(result => res.send(result))
+    .catch(err => console.log(err));
+});
+
+app.get('/api/test-create/seance', (req, res) => {
+  const {seance} = require('./forTest/testTheater')
+    addSeance(seance)
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  });
