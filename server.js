@@ -7,8 +7,6 @@ const { getMovieSeance } = require('./src/methods/clientMethods')
 const app = express();
 const jsonParser = express.json();
 
-
-
 app.set('port', (process.env.PORT || 5000));
 
 mongoose.connect('mongodb+srv://root:root@cinemacluster-fmgmj.mongodb.net/test?retryWrites=true', {useNewUrlParser: true, dbName: 'CinemaDb'}, err => {
@@ -25,9 +23,6 @@ app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
-
-
-
 
 app.get('/api/movies',(req, res) => {
   Movie.find({}, (err, movies) => {

@@ -11,7 +11,6 @@ const seanceSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: 'movie_theaters.halls',
       required: true,
-
   },
   format: {
     video: {
