@@ -23,7 +23,7 @@ const movieSchema = new Schema({
   description: {
     type: String,
   },
-  language: {F
+  language: {
     type: String,
   },
   poster: {

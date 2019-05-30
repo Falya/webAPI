@@ -12,21 +12,14 @@ const hallSchema = new Schema({
         type: Number,
         required: true
       },
-      seats: [
-        {
-          seat_type: {
-            type: String,
-            enum: ['simple', 'VIP', 'love'],
-            required: true,
-            index: true
-          },
-          seat_number: {
-            type: Number,
-            required: true,
-            index: true
-          }
-        }
-      ]
+      row_length: {
+        type: Number,
+        required: true
+      },
+      row_type: {
+        type: String,
+        enum: ['simple', 'double', 'vip']
+      }
     }
   ]
 });
@@ -51,7 +44,6 @@ const movieTheaterSchema = new Schema({
       index: true
     }
   ],
-
   seances: [
     {
       type: Schema.Types.ObjectId,

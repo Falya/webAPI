@@ -36,9 +36,8 @@ async function addSeance(data) {
     });
 
     const seance = await newSeance.save();
-    await MovieTheater.findById(cinema.id).update({ $push: { seances: seance.id } });
-
     return seance;
+
   } catch (error) {
     handleError(error);
   }

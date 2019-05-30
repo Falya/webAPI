@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const MovieTheater = require('./MovieTheater');
 const Schema = mongoose.Schema;
 
 const seanceSchema = new Schema({
@@ -30,7 +31,10 @@ const seanceSchema = new Schema({
   },
 });
 
-seanceSchema.post('save', fn)
+seanceSchema.post('save', function (seance, next) {
+  MovieTheater.findOne({'halls._id': seance.hall_id}).updateOne({$push: {seances: seance._id}})
+  .then(() => next());
+});
 
 const Seance = mongoose.model("seances", seanceSchema);
 
