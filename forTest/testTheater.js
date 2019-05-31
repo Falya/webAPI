@@ -44,8 +44,8 @@ const theater = {
 const seance = {
   movie_name: 'Avengers: Endgame',
   cinema: {
-    name: 'Salut',
-    hall: 'Hall 1'
+    name: 'Rocket',
+    hall: 'Hall 2'
   },
   date: new Date('2019-06-01T22:30')
 };

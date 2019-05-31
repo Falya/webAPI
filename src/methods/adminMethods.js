@@ -32,6 +32,7 @@ async function addSeance(data) {
     const newSeance = new Seance({
       movie_name: movie.id,
       hall_id,
+      hall_name: data.cinema.hall,
       date: data.date
     });
 

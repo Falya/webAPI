@@ -13,6 +13,10 @@ const seanceSchema = new Schema({
       ref: 'movie_theaters.halls',
       required: true,
   },
+  hall_name: {
+    type: String,
+    required: true,
+  },
   format: {
     video: {
       type: String,

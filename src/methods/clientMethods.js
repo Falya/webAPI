@@ -5,14 +5,14 @@ const Movie = require('../models/Movie');
 async function getMovieSeances(movieId) {
   try {
     const movie = await Movie.findById(movieId);
-    const allTheaters = await MovieTheater.find().populate('seances');
+    const allTheaters = await MovieTheater.find().populate({path: 'seances'});
 
     const theaters = allTheaters.reduce((acc, theater) => {
       const { seances } = theater;
 
       if (seances.length && seances.some(({ movie_name }) => movie_name == movieId)) {
-        console.log(seances);
         const filteredSeances = seances.filter(({ movie_name }) => movie_name == movieId);
+
         const filteredTheater = Object.assign(theater);
         filteredTheater.seances = filteredSeances;
         acc.push(filteredTheater);
