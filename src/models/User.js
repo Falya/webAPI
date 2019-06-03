@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  nickname: {
+  nickName: {
     type: String,
     unique: true,
   },
@@ -10,9 +10,7 @@ const userSchema = new Schema({
     type: String,
     unique: true,
   },
-  password: {
-    type: String,
-  }
+  password: String
 });
 
 const User = mongoose.model("users", userSchema);

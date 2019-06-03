@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const express = require('express');
+const cors = require('cors')
 const User = require('./src/models/User');
 const Movie = require('./src/models/Movie');
 const { addMovieTheater, addSeance } = require('./src/methods/adminMethods');
@@ -18,11 +19,7 @@ mongoose.connect('mongodb+srv://root:root@cinemacluster-fmgmj.mongodb.net/test?r
  });
 });
 
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+app.use(cors());
 
 app.get('/api/movies',(req, res) => {
   Movie.find({}, (err, movies) => {
@@ -36,7 +33,6 @@ app.get('/api/movies',(req, res) => {
 app.get('/api/movies/movie/seances/:id', (req, res) => {
    getMovieSeance(req.params.id)
     .then(data => {
-      // console.log(data);
       res.send(data);
     })
     .catch(err => console.log(err));

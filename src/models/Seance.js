@@ -3,17 +3,17 @@ const MovieTheater = require('./MovieTheater');
 const Schema = mongoose.Schema;
 
 const seanceSchema = new Schema({
-  movie_name: {
+  movieName: {
     type: Schema.Types.ObjectId,
     ref: 'movies',
     required: true
   },
-  hall_id: {
+  hallId: {
       type: Schema.Types.ObjectId,
-      ref: 'movie_theaters.halls',
+      ref: 'movieTheaters.halls',
       required: true,
   },
-  hall_name: {
+  hallName: {
     type: String,
     required: true,
   },

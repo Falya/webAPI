@@ -2,16 +2,17 @@ const MovieTheater = require('../models/MovieTheater');
 const City = require('../models/City');
 const Seance = require('../models/Seance');
 const Movie = require('../models/Movie');
+
 /**
  *
  * @param {Object} data
  */
 function addMovieTheater(data) {
   return City.findOne({ city: data.city })
-    .then(city_id => {
+    .then(cityId => {
       return (movieTheater = new MovieTheater({
         ...data,
-        city: city_id
+        city: cityId
       }));
     })
     .then(theater => theater.save())
@@ -24,15 +25,15 @@ function handleError(err) {
 
 async function addSeance(data) {
   try {
-    const movie = await Movie.findOne({ name: data.movie_name });
-    const cinema = await MovieTheater.findOne({ cinema_name: data.cinema.name });
+    const movie = await Movie.findOne({ name: data.movieName });
+    const cinema = await MovieTheater.findOne({ cinemaName: data.cinema.name });
 
-    const [{ id: hall_id }] = cinema.halls.filter(hall => hall.hall_name === data.cinema.hall);
+    const [{ id: hallId }] = cinema.halls.filter(hall => hall.hallName === data.cinema.hall);
 
     const newSeance = new Seance({
-      movie_name: movie.id,
-      hall_id,
-      hall_name: data.cinema.hall,
+      movieName: movie.id,
+      hallId,
+      hallName: data.cinema.hall,
       date: data.date
     });
 

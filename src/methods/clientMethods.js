@@ -1,5 +1,4 @@
 const MovieTheater = require('../models/MovieTheater');
-const Seance = require('../models/Seance');
 const Movie = require('../models/Movie');
 
 async function getMovieSeances(movieId) {
@@ -10,8 +9,8 @@ async function getMovieSeances(movieId) {
     const theaters = allTheaters.reduce((acc, theater) => {
       const { seances } = theater;
 
-      if (seances.length && seances.some(({ movie_name }) => movie_name == movieId)) {
-        const filteredSeances = seances.filter(({ movie_name }) => movie_name == movieId);
+      if (seances.length && seances.some(({ movieName }) => movieName == movieId)) {
+        const filteredSeances = seances.filter(({ movieName }) => movieName == movieId);
 
         const filteredTheater = Object.assign(theater);
         filteredTheater.seances = filteredSeances;

@@ -2,21 +2,21 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const hallSchema = new Schema({
-  hall_name: {
+  hallName: {
     type: String,
     required: true
   },
   rows: [
     {
-      row_number: {
+      rowNumber: {
         type: Number,
         required: true
       },
-      row_length: {
+      rowLength: {
         type: Number,
         required: true
       },
-      row_type: {
+      rowType: {
         type: String,
         enum: ['simple', 'double', 'vip']
       }
@@ -25,7 +25,7 @@ const hallSchema = new Schema({
 });
 
 const movieTheaterSchema = new Schema({
-  cinema_name: {
+  cinemaName: {
     type: String,
     required: true
   },
@@ -52,6 +52,6 @@ const movieTheaterSchema = new Schema({
   ]
 });
 
-const MovieTheater = mongoose.model('movie_theaters', movieTheaterSchema);
+const MovieTheater = mongoose.model('movieTheaters', movieTheaterSchema, 'movieTheaters');
 
 module.exports = MovieTheater;

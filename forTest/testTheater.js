@@ -1,40 +1,40 @@
 const theater = {
-  cinema_name: 'Salut',
+  cinemaName: 'Salut',
   city: 'Minsk',
   adress: 'Rokossovski str. 150a',
   halls: [
     {
-      hall_name: 'Hall 1',
+      hallName: 'Hall 1',
       rows: [
         {
-          row_number: 1,
-          row_length: 20,
-          row_type: 'simple'
+          rowNumber: 1,
+          rowLength: 20,
+          rowType: 'simple'
         },
         {
-          row_number: 2,
-          row_length: 20,
-          row_type: 'simple'
+          rowNumber: 2,
+          rowLength: 20,
+          rowType: 'simple'
         },
         {
-          row_number: 3,
-          row_length: 20,
-          row_type: 'simple'
+          rowNumber: 3,
+          rowLength: 20,
+          rowType: 'simple'
         }
       ]
     },
     {
-      hall_name: 'Hall 2',
+      hallName: 'Hall 2',
       rows: [
         {
-          row_number: 1,
-          row_length: 20,
-          row_type: 'simple'
+          rowNumber: 1,
+          rowLength: 20,
+          rowType: 'simple'
         },
         {
-          row_number: 2,
-          row_length: 10,
-          row_type: 'double'
+          rowNumber: 2,
+          rowLength: 10,
+          rowType: 'double'
         }
       ]
     }
@@ -42,9 +42,9 @@ const theater = {
 };
 
 const seance = {
-  movie_name: 'Avengers: Endgame',
+  movieName: 'Avengers: Endgame',
   cinema: {
-    name: 'Rocket',
+    name: 'Salut',
     hall: 'Hall 2'
   },
   date: new Date('2019-06-01T22:30')
