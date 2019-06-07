@@ -36,7 +36,7 @@ const seanceSchema = new Schema({
 });
 
 seanceSchema.post('save', function (seance, next) {
-  MovieTheater.findOne({'halls._id': seance.hall_id}).updateOne({$push: {seances: seance._id}})
+  MovieTheater.findOne({'halls._id': seance.hallId}).updateOne({$push: {seances: seance._id}})
   .then(() => next());
 });
 

@@ -44,10 +44,10 @@ const theater = {
 const seance = {
   movieName: 'Avengers: Endgame',
   cinema: {
-    name: 'Salut',
+    name: 'Rocket',
     hall: 'Hall 2'
   },
-  date: new Date('2019-06-01T22:30')
+  date: new Date('2019-06-09T15:30')
 };
 
 module.exports.theater = theater;
