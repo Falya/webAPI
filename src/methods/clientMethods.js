@@ -9,18 +9,25 @@ async function getMovie(id) {
 }
 
 async function getMovieSeances(params) {
-  const { movieId, movieTheaterId, cityId, features, date } = params;
+  const { movieId, movieTheaterId, city, features, date } = params;
+  console.log('movieTheaterId: ', movieTheaterId);
+  console.log('movieTheaterId TYPE: ', typeof movieTheaterId);
+
   const nowTime = new Date();
   const today = new Date(date);
 
-  nowTime.setDate(today.getDate());
+  if (nowTime.getDate() !== today.getDate()) {
+    nowTime.setDate(today.getDate());
+    nowTime.setHours(00, 00, 00);
+  }
+
   nowTime.toISOString();
   today.setHours(23, 59);
   today.toISOString();
   let theaters = [];
 
   try {
-    if (movieTheaterId !== 'All cinemas') {
+    if (!movieTheaterId) {
       const movieTheater = await MovieTheater.findById(movieTheaterId);
       const halls = movieTheater.halls.map(hall => hall._id);
       const seances = await Seance.find({ date: { $lte: today, $gte: nowTime }, movieName: movieId, hallId: { $in: halls } });
@@ -31,7 +38,7 @@ async function getMovieSeances(params) {
       }
     } else {
       const allSeances = await Seance.find({ movieName: movieId, date: { $lte: today, $gte: nowTime } });
-      const movieTheaters = await MovieTheater.find({ city: cityId });
+      const movieTheaters = await MovieTheater.find({ city: city });
 
       const filteredTheaters = movieTheaters.reduce((theatersAcc, theater) => {
         const seances = theater.halls.reduce((acc, hall) => {
@@ -53,15 +60,17 @@ async function getMovieSeances(params) {
       }, []);
 
       theaters = [...filteredTheaters];
+      console.log('theaters: ', theaters);
     }
 
     return theaters;
   } catch (error) {
-
+    console.log(error)
   }
 }
 
-async function getOptionsForFilters(cityId, movieId, movieTheaterId) {
+async function getOptionsForFilters(params) {
+  const { cityId, movieId, movieTheaterId } = params;
   const today = new Date().toISOString();
   const week = new Date();
 
@@ -70,16 +79,25 @@ async function getOptionsForFilters(cityId, movieId, movieTheaterId) {
   week.toISOString();
 
   try {
-    const movieTheaters = await MovieTheater.find({ city: cityId }).select('_id cinemaName halls');
+    const cities = City.find();
+    const movieTheaters =  MovieTheater.find();
     const dates = Seance.find({ date: { $lte: week, $gte: today } });
 
-    if (movieTheaterId !== 'All cinemas') {
-      const theater = await MovieTheater.findById(movieTheaterId).select('halls');
+    if(cityId) {
+      movieTheaters.where({city: cityId})
+    } else {
+      const defaultCity = await City.findOne({city: 'Minsk'});
+      movieTheaters.where({city: defaultCity._id});
+    }
+
+
+    if (movieTheaterId) {
+      const [theater] = await MovieTheater.where({_id: movieTheaterId});
       const halls = theater.halls.map(hall => hall._id);
       dates.where({ movieName: movieId, hallId: { $in: halls } });
-
     } else {
-      const halls = movieTheaters.reduce((acc, theater) => {
+      const cinemas = await movieTheaters;
+      const halls = cinemas.reduce((acc, theater) => {
         const theaterHalls = theater.halls.map(hall => hall._id);
         acc = [...acc, ...theaterHalls];
         return acc;
@@ -88,7 +106,6 @@ async function getOptionsForFilters(cityId, movieId, movieTheaterId) {
       dates.where({ movieName: movieId, hallId: { $in: halls } });
     }
 
-    const cities = City.find();
     const movies = Movie.find().select('_id name');
 
     formatedDates = await dates.select('date').then(datesArr => {
@@ -110,7 +127,9 @@ async function getOptionsForFilters(cityId, movieId, movieTheaterId) {
         .sort((a, b) => a.date > b.date);
     });
 
-    return Promise.all([cities, movies]).then(([cities, movies]) => {
+    movieTheaters.select('cinemaName');
+
+    return Promise.all([cities, movies, movieTheaters]).then(([cities, movies, movieTheaters]) => {
       return {
         cities,
         movies,
@@ -119,7 +138,7 @@ async function getOptionsForFilters(cityId, movieId, movieTheaterId) {
       };
     });
   } catch (error) {
-
+    console.log(error);
   }
 }
 
