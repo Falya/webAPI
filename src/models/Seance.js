@@ -9,13 +9,13 @@ const seanceSchema = new Schema({
     required: true
   },
   hallId: {
-      type: Schema.Types.ObjectId,
-      ref: 'movieTheaters.halls',
-      required: true,
+    type: Schema.Types.ObjectId,
+    ref: 'movieTheaters.halls',
+    required: true
   },
   hallName: {
     type: String,
-    required: true,
+    required: true
   },
   format: {
     video: {
@@ -26,20 +26,21 @@ const seanceSchema = new Schema({
     sound: {
       type: String,
       enum: ['Dolby Digital'],
-      default: 'Dolby Digital',
+      default: 'Dolby Digital'
     }
   },
   date: {
     type: Date,
     required: true
-  },
+  }
 });
 
-seanceSchema.post('save', function (seance, next) {
-  MovieTheater.findOne({'halls._id': seance.hallId}).updateOne({$push: {seances: seance._id}})
-  .then(() => next());
+seanceSchema.post('save', function(seance, next) {
+  MovieTheater.findOne({ 'halls._id': seance.hallId })
+    .updateOne({ $push: { seances: seance._id } })
+    .then(() => next());
 });
 
-const Seance = mongoose.model("seances", seanceSchema);
+const Seance = mongoose.model('seances', seanceSchema);
 
 module.exports = Seance;
