@@ -10,9 +10,6 @@ async function getMovie(id) {
 
 async function getMovieSeances(params) {
   const { movieId, movieTheaterId, city, features, date } = params;
-  console.log('movieTheaterId: ', movieTheaterId);
-  console.log('movieTheaterId TYPE: ', typeof movieTheaterId);
-
   const nowTime = new Date();
   const today = new Date(date);
 
@@ -27,45 +24,44 @@ async function getMovieSeances(params) {
   let theaters = [];
 
   try {
-    if (!movieTheaterId) {
-      const movieTheater = await MovieTheater.findById(movieTheaterId);
+    const movieTheaterQuery = MovieTheater.find();
+    const seancesQuery = Seance.find({ date: { $lte: today, $gte: nowTime }, movieName: movieId }).sort('date');
+
+    if (movieTheaterId) {
+      const [movieTheater] = await movieTheaterQuery.where({ _id: movieTheaterId });
       const halls = movieTheater.halls.map(hall => hall._id);
-      const seances = await Seance.find({ date: { $lte: today, $gte: nowTime }, movieName: movieId, hallId: { $in: halls } });
+      const seances = await seancesQuery.where({ hallId: { $in: halls } });
+
       if (seances.length) {
         const theater = Object.assign(movieTheater);
-        theater.seances = seances.sort((a, b) => a.date > b.date);
+        theater.seances = seances;
         theaters.push(theater);
       }
     } else {
-      const allSeances = await Seance.find({ movieName: movieId, date: { $lte: today, $gte: nowTime } });
-      const movieTheaters = await MovieTheater.find({ city: city });
+      const allSeances = await seancesQuery;
+      const movieTheaters = await movieTheaterQuery.where({ city: city });
 
-      const filteredTheaters = movieTheaters.reduce((theatersAcc, theater) => {
-        const seances = theater.halls.reduce((acc, hall) => {
-          allSeances.forEach(seance => {
-            if (seance.hallId.toString() == hall._id.toString()) {
-              acc.push(seance);
+      const filteredTheaters = movieTheaters.map(theater => {
+        const seances = allSeances.filter(seance => {
+
+          for (let i = 0; i < theater.halls.length; i++) {
+            if (seance.hallId.toString() === theater.halls[i]._id.toString()) {
+              return true;
             }
-          });
-          return acc;
-        }, []);
+          }
+        });
+        let customTheater = Object.assign(theater);
+        customTheater.seances = seances;
 
-        if (seances.length) {
-          const cinema = Object.assign(theater);
-          cinema.seances = seances.sort((a, b) => a.date > b.date);
-          theatersAcc.push(cinema);
-        }
+        return customTheater;
+      });
 
-        return theatersAcc;
-      }, []);
-
-      theaters = [...filteredTheaters];
-      console.log('theaters: ', theaters);
+      theaters = filteredTheaters.filter(({ seances }) => seances.length);
     }
 
     return theaters;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }
 
@@ -80,23 +76,23 @@ async function getOptionsForFilters(params) {
 
   try {
     const cities = City.find();
-    const movieTheaters =  MovieTheater.find();
+    const movieTheaters = MovieTheater.find();
     const dates = Seance.find({ date: { $lte: week, $gte: today } });
 
-    if(cityId) {
-      movieTheaters.where({city: cityId})
+    if (cityId) {
+      movieTheaters.where({ city: cityId });
     } else {
-      const defaultCity = await City.findOne({city: 'Minsk'});
-      movieTheaters.where({city: defaultCity._id});
+      const defaultCity = await City.findOne({ city: 'Minsk' });
+      movieTheaters.where({ city: defaultCity._id });
     }
 
-
     if (movieTheaterId) {
-      const [theater] = await MovieTheater.where({_id: movieTheaterId});
+      const [theater] = await MovieTheater.where({ _id: movieTheaterId });
       const halls = theater.halls.map(hall => hall._id);
       dates.where({ movieName: movieId, hallId: { $in: halls } });
     } else {
       const cinemas = await movieTheaters;
+
       const halls = cinemas.reduce((acc, theater) => {
         const theaterHalls = theater.halls.map(hall => hall._id);
         acc = [...acc, ...theaterHalls];
@@ -108,24 +104,25 @@ async function getOptionsForFilters(params) {
 
     const movies = Movie.find().select('_id name');
 
-    formatedDates = await dates.select('date').then(datesArr => {
-      const datesMap = new Map();
+    formatedDates = await dates
+      .select('date')
+      .sort('date')
+      .then(datesArr => {
+        const datesMap = new Map();
 
-      datesArr.forEach(seance => {
-        const date = new Date(seance.date);
-        date.setHours(0, 0, 0);
-        datesMap.set(date.toLocaleDateString('en', { month: 'long', day: 'numeric', weekday: 'long' }), date);
-      });
+        datesArr.forEach(seance => {
+          const date = new Date(seance.date);
+          date.setHours(0, 0, 0);
+          datesMap.set(date.toLocaleDateString('en', { month: 'long', day: 'numeric', weekday: 'long' }), date);
+        });
 
-      return [...datesMap.entries()]
-        .map(date => {
+        return [...datesMap.entries()].map(date => {
           return {
             date: date[1],
             fulldate: date[0]
           };
-        })
-        .sort((a, b) => a.date > b.date);
-    });
+        });
+      });
 
     movieTheaters.select('cinemaName');
 
@@ -142,4 +139,4 @@ async function getOptionsForFilters(params) {
   }
 }
 
-module.exports = {getMovie, getMovieSeances, getOptionsForFilters};
+module.exports = { getMovie, getMovieSeances, getOptionsForFilters };

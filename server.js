@@ -1,4 +1,4 @@
-const {DB_CONFIG} = require('./src/config/config');
+const { DB_CONFIG } = require('./src/config/config');
 const mongoose = require('mongoose');
 const express = require('express');
 const cors = require('cors');
@@ -11,17 +11,14 @@ const app = express();
 const jsonParser = express.json();
 
 app.set('port', process.env.PORT || 5000);
-mongoose.connect(DB_CONFIG.connectionUrl,
-  { useNewUrlParser: true, dbName: DB_CONFIG.dbName },
-  err => {
-    if (err) {
-      return console.log(err);
-    }
-    app.listen(app.get('port'), () => {
-      console.log(`Server is awaiting connection...`);
-    });
+mongoose.connect(DB_CONFIG.connectionUrl, { useNewUrlParser: true, dbName: DB_CONFIG.dbName }, err => {
+  if (err) {
+    return console.log(err);
   }
-);
+  app.listen(app.get('port'), () => {
+    console.log(`Server is awaiting connection...`);
+  });
+});
 
 app.use(cors());
 
