@@ -6,7 +6,7 @@ const cors = require('cors');
 const User = require('./src/models/User');
 const Movie = require('./src/models/Movie');
 const { addMovieTheater, addSeance } = require('./src/methods/adminMethods');
-const { getMovieSeances, getMovie, getOptionsForFilters } = require('./src/methods/clientMethods');
+const { getMovieSeances, getMovie, getOptionsForFilters, getSeance } = require('./src/methods/clientMethods');
 const app = express();
 const jsonParser = express.json();
 
@@ -46,7 +46,15 @@ app.get('/api/movies/movie/seances/', (req, res) => {
 });
 
 app.get('/api/movies/filters/', (req, res) => {
-  getOptionsForFilters(req.query).then(result => res.send(result));
+  getOptionsForFilters(req.query)
+    .then(result => res.send(result))
+    .catch(err => console.log(err));
+});
+
+app.get('/api/seance/', (req, res) => {
+  getSeance(req.query)
+    .then(result => res.send(result))
+    .catch(err => console.log(err));
 });
 
 /**Some querys for create testing */

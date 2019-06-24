@@ -43,7 +43,6 @@ async function getMovieSeances(params) {
 
       const filteredTheaters = movieTheaters.map(theater => {
         const seances = allSeances.filter(seance => {
-
           for (let i = 0; i < theater.halls.length; i++) {
             if (seance.hallId.toString() === theater.halls[i]._id.toString()) {
               return true;
@@ -119,7 +118,7 @@ async function getOptionsForFilters(params) {
         return [...datesMap.entries()].map(date => {
           return {
             date: date[1],
-            fulldate: date[0]
+            fulldate: date[0],
           };
         });
       });
@@ -131,7 +130,7 @@ async function getOptionsForFilters(params) {
         cities,
         movies,
         movieTheaters,
-        dates: formatedDates
+        dates: formatedDates,
       };
     });
   } catch (error) {
@@ -139,4 +138,20 @@ async function getOptionsForFilters(params) {
   }
 }
 
-module.exports = { getMovie, getMovieSeances, getOptionsForFilters };
+async function getSeance(params) {
+  const { seanceId } = params;
+  const seance = await Seance.findById(seanceId);
+  const movieTheater = await MovieTheater.findOne(
+    { 'halls._id': seance.hallId },
+    { halls: { $elemMatch: { _id: seance.hallId } } }
+  ).select('-seances');
+  console.log('seance', seance);
+  console.log('movieTheater', movieTheater);
+
+  return {
+    seance,
+    cinemaInfo: movieTheater,
+  };
+}
+
+module.exports = { getMovie, getMovieSeances, getOptionsForFilters, getSeance };

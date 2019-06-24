@@ -19,7 +19,8 @@ const hallSchema = new Schema({
       rowType: {
         type: String,
         enum: ['simple', 'double', 'vip']
-      }
+      },
+      price: Number,
     }
   ]
 });

@@ -6,33 +6,55 @@ const seanceSchema = new Schema({
   movieName: {
     type: Schema.Types.ObjectId,
     ref: 'movies',
-    required: true
+    required: true,
   },
   hallId: {
     type: Schema.Types.ObjectId,
     ref: 'movieTheaters.halls',
-    required: true
+    required: true,
   },
   hallName: {
     type: String,
-    required: true
+    required: true,
   },
   format: {
     video: {
       type: String,
       enum: ['2D', '3D'],
-      default: '2D'
+      default: '2D',
     },
     sound: {
       type: String,
       enum: ['Dolby Digital'],
-      default: 'Dolby Digital'
-    }
+      default: 'Dolby Digital',
+    },
   },
   date: {
     type: Date,
-    required: true
-  }
+    required: true,
+  },
+  soldSeats: [
+    {
+      rowNumber: Number,
+      seatNumber: Number,
+    },
+  ],
+  blockedSeats: [
+    {
+      rowNumber: Number,
+      seatNumber: Number,
+      customer: {
+        type: Schema.Types.ObjectId,
+        ref: 'users',
+      },
+      createAt: {
+        type: Date,
+        default: Date.now(),
+        required: true,
+        expires: '15m',
+      },
+    },
+  ],
 });
 
 seanceSchema.post('save', function(seance, next) {

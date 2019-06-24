@@ -10,9 +10,23 @@ const userSchema = new Schema({
     type: String,
     unique: true,
   },
-  password: String
+  password: String,
+  boughtSeats: [
+    {
+      rowNumber: Number,
+      seatNumber: Number,
+      seance: {
+        type: Schema.Types.ObjectId,
+        ref: 'seances',
+      },
+      buyingTime: {
+        type: Date,
+        default: Date.now(),
+      },
+    },
+  ],
 });
 
-const User = mongoose.model("users", userSchema);
+const User = mongoose.model('users', userSchema);
 
 module.exports = User;
