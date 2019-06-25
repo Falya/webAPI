@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const MovieTheater = require('./MovieTheater');
+import mongoose from 'mongoose';
+import MovieTheater from './MovieTheater.mjs';
 const Schema = mongoose.Schema;
 
 const seanceSchema = new Schema({
@@ -65,4 +65,4 @@ seanceSchema.post('save', function(seance, next) {
 
 const Seance = mongoose.model('seances', seanceSchema);
 
-module.exports = Seance;
+export default Seance;
