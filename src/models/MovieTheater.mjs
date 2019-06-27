@@ -1,57 +1,58 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const hallSchema = new Schema({
   hallName: {
     type: String,
-    required: true
+    required: true,
   },
   rows: [
     {
       rowNumber: {
         type: Number,
-        required: true
+        required: true,
       },
       rowLength: {
         type: Number,
-        required: true
+        required: true,
       },
       rowType: {
         type: String,
-        enum: ['simple', 'double', 'vip']
-      }
-    }
-  ]
+        enum: ['simple', 'double', 'vip'],
+      },
+      price: Number,
+    },
+  ],
 });
 
 const movieTheaterSchema = new Schema({
   cinemaName: {
     type: String,
-    required: true
+    required: true,
   },
   city: {
     type: Schema.Types.ObjectId,
     ref: 'cities',
-    required: true
+    required: true,
   },
   adress: {
     type: String,
-    required: true
+    required: true,
   },
   halls: [
     {
       type: hallSchema,
-      index: true
-    }
+      index: true,
+    },
   ],
   seances: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'seances'
-    }
-  ]
+      ref: 'seances',
+    },
+  ],
 });
 
 const MovieTheater = mongoose.model('movieTheaters', movieTheaterSchema, 'movieTheaters');
 
-module.exports = MovieTheater;
+export default MovieTheater;

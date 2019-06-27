@@ -8,16 +8,31 @@
   },
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "server": "node server.js"
+    "start": "node --experimental-modules ./bin/www",
+    "server": "node --experimental-modules server.mjs",
+    "local": "nodemon --experimental-modules server.mjs "
   },
   "dependencies": {
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.5.11",
-    "morgan": "~1.9.1",
-    "pug": "2.0.0-beta11"
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "pug": "2.0.0-beta11",
+    "morgan": "^1.9.1"
+  },
+  "devDependencies": {
+    "eslint": "^6.0.1",
+    "eslint-config-prettier": "^5.1.0",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-prettier": "^3.1.0",
+
+    "nodemon": "^1.19.1",
+    "prettier": "^1.18.2"
   }
 }

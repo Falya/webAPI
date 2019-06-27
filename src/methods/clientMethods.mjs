@@ -1,21 +1,22 @@
-const MovieTheater = require('../models/MovieTheater');
-const Movie = require('../models/Movie');
-const City = require('../models/City');
-const Seance = require('../models/Seance');
+import MovieTheater from '../models/MovieTheater.mjs';
+import Movie from '../models/Movie.mjs';
+import City from '../models/City.mjs';
+import Seance from '../models/Seance.mjs';
 
-async function getMovie(id) {
+export async function getMovie(id) {
   const movie = await Movie.findById(id);
   return movie;
 }
 
-async function getMovieSeances(params) {
+export async function getMovieSeances(params) {
   const { movieId, movieTheaterId, city, features, date } = params;
   const nowTime = new Date();
   const today = new Date(date);
 
   if (nowTime.getDate() !== today.getDate()) {
+    const octal = parseInt('00');
     nowTime.setDate(today.getDate());
-    nowTime.setHours(00, 00, 00);
+    nowTime.setHours(octal, octal, octal);
   }
 
   nowTime.toISOString();
@@ -39,18 +40,17 @@ async function getMovieSeances(params) {
       }
     } else {
       const allSeances = await seancesQuery;
-      const movieTheaters = await movieTheaterQuery.where({ city: city });
+      const movieTheaters = await movieTheaterQuery.where({ city });
 
       const filteredTheaters = movieTheaters.map(theater => {
         const seances = allSeances.filter(seance => {
-
           for (let i = 0; i < theater.halls.length; i++) {
             if (seance.hallId.toString() === theater.halls[i]._id.toString()) {
               return true;
             }
           }
         });
-        let customTheater = Object.assign(theater);
+        const customTheater = Object.assign(theater);
         customTheater.seances = seances;
 
         return customTheater;
@@ -65,12 +65,13 @@ async function getMovieSeances(params) {
   }
 }
 
-async function getOptionsForFilters(params) {
+export async function getOptionsForFilters(params) {
   const { cityId, movieId, movieTheaterId } = params;
   const today = new Date().toISOString();
   const week = new Date();
+  const octal = parseInt('00');
 
-  week.setHours(00);
+  week.setHours(octal);
   week.setDate(week.getDate() + 7);
   week.toISOString();
 
@@ -104,7 +105,7 @@ async function getOptionsForFilters(params) {
 
     const movies = Movie.find().select('_id name');
 
-    formatedDates = await dates
+    const formatedDates = await dates
       .select('date')
       .sort('date')
       .then(datesArr => {
@@ -116,27 +117,37 @@ async function getOptionsForFilters(params) {
           datesMap.set(date.toLocaleDateString('en', { month: 'long', day: 'numeric', weekday: 'long' }), date);
         });
 
-        return [...datesMap.entries()].map(date => {
-          return {
-            date: date[1],
-            fulldate: date[0]
-          };
-        });
+        return [...datesMap.entries()].map(date => ({
+          date: date[1],
+          fulldate: date[0],
+        }));
       });
 
     movieTheaters.select('cinemaName');
 
-    return Promise.all([cities, movies, movieTheaters]).then(([cities, movies, movieTheaters]) => {
-      return {
-        cities,
-        movies,
-        movieTheaters,
-        dates: formatedDates
-      };
-    });
+    return Promise.all([cities, movies, movieTheaters]).then(([cities, movies, movieTheaters]) => ({
+      cities,
+      movies,
+      movieTheaters,
+      dates: formatedDates,
+    }));
   } catch (error) {
     console.log(error);
   }
 }
 
-module.exports = { getMovie, getMovieSeances, getOptionsForFilters };
+export async function getSeance(params) {
+  const { seanceId } = params;
+  const seance = await Seance.findById(seanceId);
+  const movieTheater = await MovieTheater.findOne(
+    { 'halls._id': seance.hallId },
+    { halls: { $elemMatch: { _id: seance.hallId } } }
+  ).select('-seances');
+  console.log('seance', seance);
+  console.log('movieTheater', movieTheater);
+
+  return {
+    seance,
+    cinemaInfo: movieTheater,
+  };
+}
