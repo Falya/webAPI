@@ -51,6 +51,12 @@ const movieTheaterSchema = new Schema({
       ref: 'seances',
     },
   ],
+  features: [
+    {
+      product: String,
+      price: Number,
+    },
+  ],
 });
 
 const MovieTheater = mongoose.model('movieTheaters', movieTheaterSchema, 'movieTheaters');

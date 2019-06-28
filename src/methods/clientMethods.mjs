@@ -2,6 +2,7 @@ import MovieTheater from '../models/MovieTheater.mjs';
 import Movie from '../models/Movie.mjs';
 import City from '../models/City.mjs';
 import Seance from '../models/Seance.mjs';
+import BlockedSeats from '../models/BlockedSeats.mjs';
 
 export async function getMovie(id) {
   const movie = await Movie.findById(id);
@@ -137,17 +138,58 @@ export async function getOptionsForFilters(params) {
 }
 
 export async function getSeance(params) {
-  const { seanceId } = params;
+  const { seanceId, userId } = params;
   const seance = await Seance.findById(seanceId);
   const movieTheater = await MovieTheater.findOne(
     { 'halls._id': seance.hallId },
     { halls: { $elemMatch: { _id: seance.hallId } } }
   ).select('-seances');
-  console.log('seance', seance);
-  console.log('movieTheater', movieTheater);
-
+  const nowTime = new Date();
+  nowTime.toISOString();
+  const blockedSeatsQuery = BlockedSeats.find({ seanceId }).where({ expireAt: { $gte: nowTime } });
+  const blockedSeats = await blockedSeatsQuery;
+  let blockedSeatsByUser = [];
+  if (userId) {
+    blockedSeatsByUser = await blockedSeatsQuery.where({ userId }).sort('expireAt');
+    console.log(blockedSeatsByUser);
+  }
   return {
     seance,
     cinemaInfo: movieTheater,
+    blockedSeats,
+    blockedSeatsByUser,
   };
+}
+
+export async function toBlockSeat(params) {
+  const { seanceId, seat, row, userId } = params;
+
+  try {
+    const blockedSeat = await BlockedSeats.findOne({ seanceId, seat, row });
+    if (blockedSeat) {
+      return { success: false, message: 'seat is already blocked' };
+    }
+
+    const newBlockedSeat = new BlockedSeats({ ...params });
+    await newBlockedSeat.save();
+    return {
+      success: true,
+      message: 'seat is blocked',
+    };
+  } catch (error) {
+    console.log(error);
+    return { success: false, message: 'seat is not blocked' };
+  }
+}
+
+export async function unBlockSeat(params) {
+  const { seatId, userId } = params;
+  try {
+    await BlockedSeats.findOne({ _id: seatId, userId }).remove();
+
+    return { success: true, message: 'seat is unblocked' };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: 'seat is not unblocked' };
+  }
 }

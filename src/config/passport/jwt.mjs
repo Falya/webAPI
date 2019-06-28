@@ -12,14 +12,15 @@ const options = {
 
 passport.use(
   new JwtStrategy(options, async (jwtPayload, done) => {
+    console.log(jwtPayload);
     try {
       const user = await User.findById(jwtPayload.id);
       if (user) {
         return done(null, user);
       }
-      return done(null, false);
+      return done(null, false, { message: 'Incorrect password.' });
     } catch (error) {
-      done(error, false);
+      done(error, false, { message: 'Unauthorized' });
     }
   })
 );
