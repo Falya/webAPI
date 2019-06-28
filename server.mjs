@@ -14,7 +14,7 @@ const app = express();
 
 mongoose.Promise = global.Promise;
 app.set('port', process.env.PORT || 5000);
-mongoose.connect(process.env._DB_URL, { useNewUrlParser: true, dbName: process.env._DB_NAME }, err => {
+mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, dbName: process.env.DB_NAME }, err => {
   if (err) {
     return console.error(err);
   }
