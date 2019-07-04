@@ -35,6 +35,10 @@ const seanceSchema = new Schema({
   },
   soldSeats: [
     {
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'users',
+      },
       rowNumber: Number,
       seatNumber: Number,
     },
