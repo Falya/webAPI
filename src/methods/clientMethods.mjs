@@ -214,11 +214,13 @@ export async function compareOrder(params) {
     const seanceId = orderTickets[0].seanceId;
     const updateSeance = Seance.findById(seanceId).updateOne({ $push: { soldSeats } });
 
-    const userSeats = orderTickets.map(({ row, seat, seanceId }) => {
+    const userSeats = orderTickets.map(({ row, seat, seanceId, seatType, price }) => {
       return {
         seanceId,
         rowNumber: row,
         seatNumber: seat,
+        seatType,
+        price,
       };
     });
 
@@ -250,6 +252,26 @@ export async function compareOrder(params) {
       },
     };
   } catch (error) {
+    console.error(error);
     return { success: false, message: 'Tickets hasn`t been add to user' };
   }
+}
+
+export async function getUserProfile(user) {
+  const userQuery = User.findById(user._id)
+    .populate({ path: 'tickets.seanceId', populate: { path: 'movieName' } })
+    // .populate({ path: 'tickets.seanceId', populate: { path: 'hallId' } })
+    .select('tickets features -_id')
+    .sort('tickets.seanceId.movieName');
+  const userInfo = await userQuery;
+
+  let uniqSeances = new Set();
+
+  userInfo.tickets.map(({ seanceId }) => {
+    uniqSeances.add(seanceId);
+  });
+
+  const seancesId = uniqSeances.map({ hallId });
+
+  return userInfo.populate('tickets.seanceId.hallId');
 }

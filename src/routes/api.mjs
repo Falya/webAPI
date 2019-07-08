@@ -10,8 +10,12 @@ import { unBlockSeat } from '../methods/clientMethods.mjs';
 import uuidv4 from 'uuid/v4.js';
 import stripeApp from 'stripe';
 import { compareOrder } from '../methods/clientMethods.mjs';
+import dotenv from 'dotenv';
+import { getUserProfile } from '../methods/clientMethods.mjs';
 
-const stripe = stripeApp('sk_test_Z5oF19hD8iS7qxnOpPJq3VQq009azySefO');
+dotenv.config();
+
+const stripe = stripeApp(process.env.STRIPE_SECRET_KEY);
 
 const router = express.Router();
 
@@ -90,6 +94,11 @@ router.post('/seance/unblock-seat', passport.authenticate('jwt', { session: fals
   };
 
   unBlockSeat(params).then(result => res.json(result));
+});
+
+router.get('/user', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  const result = await getUserProfile(req.user);
+   res.json(result);
 });
 
 /**Some querys for create testing */

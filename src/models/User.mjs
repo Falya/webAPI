@@ -17,6 +17,8 @@ const userSchema = new Schema({
     {
       rowNumber: Number,
       seatNumber: Number,
+      price: Number,
+      seatType: String,
       seanceId: {
         type: Schema.Types.ObjectId,
         ref: 'seances',

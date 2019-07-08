@@ -39,12 +39,7 @@ const movieTheaterSchema = new Schema({
     type: String,
     required: true,
   },
-  halls: [
-    {
-      type: hallSchema,
-      index: true,
-    },
-  ],
+  halls: [hallSchema],
   seances: [
     {
       type: Schema.Types.ObjectId,
