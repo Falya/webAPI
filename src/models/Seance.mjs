@@ -10,7 +10,7 @@ const seanceSchema = new Schema({
   },
   hallId: {
     type: Schema.Types.ObjectId,
-    ref: 'movieTheaters.halls',
+    ref: 'halls',
     required: true,
   },
   hallName: {
@@ -46,7 +46,7 @@ const seanceSchema = new Schema({
 });
 
 seanceSchema.post('save', function(seance, next) {
-  MovieTheater.findOne({ 'halls._id': seance.hallId })
+  MovieTheater.findOne({ halls: seance.hallId })
     .updateOne({ $push: { seances: seance._id } })
     .then(() => next());
 });
