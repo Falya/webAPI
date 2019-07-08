@@ -13,6 +13,10 @@ const userSchema = new Schema({
     unique: true,
   },
   password: String,
+  registredAt: {
+    type: Date,
+    default: Date.now(),
+  },
   tickets: [
     {
       rowNumber: Number,
