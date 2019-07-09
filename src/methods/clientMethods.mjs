@@ -11,7 +11,25 @@ export async function getMovie(id) {
   return movie;
 }
 
-export async function getCurrentMovies() {}
+export async function getCurrentMovies() {
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0);
+  currentDate.toISOString();
+
+  try {
+    const movies = await Movie.find().where({ startDate: { $lte: currentDate }, endDate: { $gte: currentDate } });
+
+    if (movies) {
+      return movies;
+    }
+
+    return [];
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getFeatureMovies(params) {}
 
 export async function getMovieSeances(params) {
   const { movieId, movieTheaterId, city, features, date } = params;
