@@ -10,6 +10,8 @@ export async function getMovie(id) {
   return movie;
 }
 
+export async function getCurrentMovies() {}
+
 export async function getMovieSeances(params) {
   const { movieId, movieTheaterId, city, features, date } = params;
   const nowTime = new Date();

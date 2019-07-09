@@ -1,30 +1,6 @@
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
-// const hallSchema = new Schema({
-//   hallName: {
-//     type: String,
-//     required: true,
-//   },
-//   rows: [
-//     {
-//       rowNumber: {
-//         type: Number,
-//         required: true,
-//       },
-//       rowLength: {
-//         type: Number,
-//         required: true,
-//       },
-//       rowType: {
-//         type: String,
-//         enum: ['simple', 'double', 'vip'],
-//       },
-//       price: Number,
-//     },
-//   ],
-// });
-
 const movieTheaterSchema = new Schema({
   cinemaName: {
     type: String,
