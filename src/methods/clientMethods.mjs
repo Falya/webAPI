@@ -3,6 +3,7 @@ import Movie from '../models/Movie.mjs';
 import City from '../models/City.mjs';
 import Seance from '../models/Seance.mjs';
 import BlockedSeats from '../models/BlockedSeats.mjs';
+import messages from '../namedMessages/namedMessages.mjs';
 
 export async function getMovie(id) {
   const movie = await Movie.findById(id);
@@ -167,18 +168,15 @@ export async function toBlockSeat(params) {
   try {
     const blockedSeat = await BlockedSeats.findOne({ seanceId, seat, row });
     if (blockedSeat) {
-      return { success: false, message: 'seat is already blocked' };
+      return messages.BLOCK_SEAT_ALREADY_BLOCKED;
     }
 
     const newBlockedSeat = new BlockedSeats({ ...params });
     await newBlockedSeat.save();
-    return {
-      success: true,
-      message: 'seat is blocked',
-    };
+    return messages.BLOCK_SEAT_SUCCESS;
   } catch (error) {
     console.log(error);
-    return { success: false, message: 'seat is not blocked' };
+    return messages.BLOCK_SEAT_FAILED;
   }
 }
 
@@ -187,9 +185,9 @@ export async function unBlockSeat(params) {
   try {
     await BlockedSeats.findOne({ _id: seatId, userId }).remove();
 
-    return { success: true, message: 'seat is unblocked' };
+    return messages.UNBLOCK_SEAT_SUCCESS;
   } catch (error) {
     console.error(error);
-    return { success: false, message: 'seat is not unblocked' };
+    return messages.UNBLOCK_SEAT_FAILED;
   }
 }

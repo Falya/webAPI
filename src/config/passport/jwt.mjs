@@ -2,6 +2,7 @@ import passport from 'passport';
 import passportJwt from 'passport-jwt';
 import configAuth from '../auth.mjs';
 import User from '../../models/User.mjs';
+import messages from '../../namedMessages/namedMessages.mjs';
 const JwtStrategy = passportJwt.Strategy;
 const ExtractJwt = passportJwt.ExtractJwt;
 
@@ -18,9 +19,9 @@ passport.use(
       if (user) {
         return done(null, user);
       }
-      return done(null, false, { message: 'Incorrect password.' });
+      return done(null, false, messages.JWT_AUTHORIZE_INCORRECT_PASSWORD);
     } catch (error) {
-      done(error, false, { message: 'Unauthorized' });
+      done(error, false, messages.JWT_UNAUTHORIZED);
     }
   })
 );

@@ -28,7 +28,6 @@ const blockedSeatsSchema = new Schema({
     expires: 0,
   },
 });
-// blockedSeatsSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 });
 
 blockedSeatsSchema.pre('save', function(next) {
   const time = new Date();

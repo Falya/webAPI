@@ -75,7 +75,6 @@ router.post('/seance/to-block-seat', passport.authenticate('jwt', { session: fal
     userId: req.user._id,
   };
   toBlockSeat(params).then(result => res.json(result));
-  // res.json(req.body);
 });
 
 router.post('/seance/unblock-seat', passport.authenticate('jwt', { session: false }), async (req, res) => {

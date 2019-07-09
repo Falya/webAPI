@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node --experimental-modules ./bin/www",
     "server": "node --experimental-modules server.mjs",
-    "local": "nodemon --experimental-modules  server.mjs "
+    "local": "nodemon --experimental-modules server.mjs "
   },
   "dependencies": {
     "bcrypt": "^3.0.6",
