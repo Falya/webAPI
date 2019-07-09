@@ -10,8 +10,12 @@ import { unBlockSeat } from '../methods/clientMethods.mjs';
 import uuidv4 from 'uuid/v4.js';
 import stripeApp from 'stripe';
 import { compareOrder } from '../methods/clientMethods.mjs';
+import dotenv from 'dotenv';
+import messages from '../namedMessages/namedMessages.mjs';
 
-const stripe = stripeApp('sk_test_Z5oF19hD8iS7qxnOpPJq3VQq009azySefO');
+dotenv.config();
+
+const stripe = stripeApp(process.env.STRIPE_SECRET_KEY);
 
 const router = express.Router();
 
@@ -80,7 +84,6 @@ router.post('/seance/to-block-seat', passport.authenticate('jwt', { session: fal
     userId: req.user._id,
   };
   toBlockSeat(params).then(result => res.json(result));
-  // res.json(req.body);
 });
 
 router.post('/seance/unblock-seat', passport.authenticate('jwt', { session: false }), async (req, res) => {
@@ -109,7 +112,7 @@ router.post('/payment', passport.authenticate('jwt', { session: false }), async 
   console.log(req.body);
 
   let error;
-  let status = { success: false, message: 'Failed payment' };
+  let status = messages.PAYMENT_FAILED;
   try {
     const {
       totalPrice,
