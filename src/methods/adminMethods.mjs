@@ -28,10 +28,10 @@ export async function addMovieTheater(data) {
   //     })
   //     .then(theater => theater.save())
   //     .catch(err => handleError(err));
-  // }
+}
 
-  // function handleError(err) {
-  //   console.log(err);
+function handleError(err) {
+  console.log(err);
 }
 
 export async function addSeance(data) {

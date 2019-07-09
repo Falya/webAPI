@@ -12,6 +12,7 @@ import stripeApp from 'stripe';
 import { compareOrder } from '../methods/clientMethods.mjs';
 import dotenv from 'dotenv';
 import { getUserProfile } from '../methods/clientMethods.mjs';
+import messages from '../namedMessages/namedMessages.mjs';
 
 dotenv.config();
 
@@ -84,7 +85,6 @@ router.post('/seance/to-block-seat', passport.authenticate('jwt', { session: fal
     userId: req.user._id,
   };
   toBlockSeat(params).then(result => res.json(result));
-  // res.json(req.body);
 });
 
 router.post('/seance/unblock-seat', passport.authenticate('jwt', { session: false }), async (req, res) => {
@@ -105,7 +105,7 @@ router.post('/payment', passport.authenticate('jwt', { session: false }), async 
   console.log(req.body);
 
   let error;
-  let status = { success: false, message: 'Failed payment' };
+  let status = messages.PAYMENT_FAILED;
   try {
     const {
       totalPrice,
