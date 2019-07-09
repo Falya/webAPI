@@ -46,7 +46,6 @@ export async function getMovieSeances(params) {
       const filteredTheaters = movieTheaters.map(theater => {
         const seances = allSeances.filter(seance => {
           for (let i = 0; i < theater.halls.length; i++) {
-            // console.log('seance', seance.hallId);
             if (seance.hallId._id.toString() === theater.halls[i].toString()) {
               return true;
             }
