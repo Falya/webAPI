@@ -19,9 +19,9 @@ passport.use(
       if (user) {
         return done(null, user);
       }
-      return done(null, false, messages.JWT_AUTHORIZE_INCORRECT_PASSWORD);
+      return done(null, false, { message: messages.JWT_AUTHORIZE_INCORRECT_PASSWORD });
     } catch (error) {
-      done(error, false, messages.JWT_UNAUTHORIZED);
+      done(error, false, { message: messages.JWT_UNAUTHORIZED });
     }
   })
 );
