@@ -103,7 +103,7 @@ router.post('/payment', passport.authenticate('jwt', { session: false }), async 
   console.log(req.body);
 
   let error;
-  let status = messages.PAYMENT_FAILED;
+  let status = { success: false, message: messages.PAYMENT_FAILED };
   try {
     const {
       totalPrice,
@@ -127,7 +127,7 @@ router.post('/payment', passport.authenticate('jwt', { session: false }), async 
     });
 
     if (stripeTokenType === 'card') {
-      const idempotency_key = uuidv4();
+      const idempotencyKey = uuidv4();
       const charge = await stripe.charges.create(
         {
           amount,
@@ -136,7 +136,7 @@ router.post('/payment', passport.authenticate('jwt', { session: false }), async 
           description: description,
         },
         {
-          idempotency_key,
+          idempotency_key: idempotencyKey,
         }
       );
       console.log('charge:');
