@@ -165,15 +165,15 @@ export async function toBlockSeat(params) {
   try {
     const blockedSeat = await BlockedSeats.findOne({ seanceId, seat, row });
     if (blockedSeat) {
-      return messages.BLOCK_SEAT_ALREADY_BLOCKED;
+      return { success: false, message: messages.BLOCK_SEAT_ALREADY_BLOCKED };
     }
 
     const newBlockedSeat = new BlockedSeats({ ...params });
     await newBlockedSeat.save();
-    return messages.BLOCK_SEAT_SUCCESS;
+    return { success: false, message: messages.BLOCK_SEAT_SUCCESS };
   } catch (error) {
     console.log(error);
-    return messages.BLOCK_SEAT_FAILED;
+    return { success: false, message: messages.BLOCK_SEAT_FAILED };
   }
 }
 
@@ -182,10 +182,10 @@ export async function unBlockSeat(params) {
   try {
     await BlockedSeats.findOne({ _id: seatId, userId }).remove();
 
-    return messages.UNBLOCK_SEAT_SUCCESS;
+    return { success: true, message: messages.UNBLOCK_SEAT_SUCCESS };
   } catch (error) {
     console.error(error);
-    return messages.UNBLOCK_SEAT_FAILED;
+    return { success: false, message: messages.UNBLOCK_SEAT_FAILED };
   }
 }
 
@@ -238,7 +238,8 @@ export async function compareOrder(params) {
     await Promise.all([deleteSeats, updateSeance, updateUser]);
 
     return {
-      ...messages.PAYMENT_TICKETS_SUCCESS,
+      success: true,
+      message: messages.PAYMENT_TICKETS_SUCCESS,
       order: {
         tickets: userSeats,
         features: userFeatures,
@@ -246,7 +247,7 @@ export async function compareOrder(params) {
     };
   } catch (error) {
     console.error(error);
-    return messages.PAYMENT_TICKETS_FAILED;
+    return { success: false, message: messages.PAYMENT_TICKETS_FAILED };
   }
 }
 

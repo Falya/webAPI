@@ -22,20 +22,20 @@ export const login = async payload => {
       const user = await User.findOne({ nickName: nickName });
 
       if (!user) {
-        return messages.LOGIN_NO_FOUND_USER;
+        return { message: messages.LOGIN_NO_FOUND_USER };
       }
 
       const validate = await user.validatePassword(password);
 
       if (!validate) {
-        return messages.LOGIN_WRONG_PASSWORD;
+        return { message: messages.LOGIN_WRONG_PASSWORD };
       }
 
       return generateToken(user.id);
     }
   } catch (error) {
     console.error(error);
-    return messages.LOGIN_FAILED;
+    return { success: false, message: messages.LOGIN_FAILED };
   }
 };
 
@@ -46,7 +46,7 @@ export const signup = async payload => {
     const user = await User.findOne({ $or: [{ email: email }, { nickName: nickName }] });
 
     if (user) {
-      return messages.SIGNUP_DUPLICATE_USER;
+      return { message: messages.SIGNUP_DUPLICATE_USER };
     }
 
     const newUser = new User();
@@ -58,6 +58,6 @@ export const signup = async payload => {
     return generateToken(newUser.id);
   } catch (error) {
     console.error(error);
-    return messages.SIGNUP_FAILED;
+    return { success: false, message: messages.SIGNUP_FAILED };
   }
 };
