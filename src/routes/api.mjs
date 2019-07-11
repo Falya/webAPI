@@ -47,8 +47,8 @@ router.get('/movies/movie/', (req, res) => {
     .catch(err => console.log(err));
 });
 
-router.get('/movies/movie/seances/', (req, res) => {
-  getMovieSeances(req.query)
+router.post('/movies/movie/seances/', (req, res) => {
+  getMovieSeances(req.body)
     .then(data => {
       res.send(data);
     })

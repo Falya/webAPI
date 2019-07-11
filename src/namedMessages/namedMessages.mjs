@@ -19,6 +19,7 @@ const messages = {
   PAYMENT_FAILED: 'Failed payment',
   PAYMENT_TICKETS_SUCCESS: 'Tickets added to user',
   PAYMENT_TICKETS_FAILED: 'Tickets hasn`t been add',
+  USER_PROFILE_FAILED: 'Something was wrong',
 };
 
 export default messages;

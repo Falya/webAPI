@@ -5,6 +5,7 @@ import Seance from '../models/Seance.mjs';
 import BlockedSeats from '../models/BlockedSeats.mjs';
 import User from '../models/User.mjs';
 import messages from '../namedMessages/namedMessages.mjs';
+import { filterSeancesByFeatures } from '../utils/utils.mjs';
 
 export async function getMovie(id) {
   const movie = await Movie.findById(id);
@@ -29,17 +30,18 @@ export async function getCurrentMovies() {
   }
 }
 
-export async function getFeatureMovies(params) {}
-
 export async function getMovieSeances(params) {
   const { movieId, movieTheaterId, city, features, date } = params;
   const nowTime = new Date();
   const today = new Date(date);
 
+  const { emptyMoreOne, emptyMoreTwo, hasEmptyVip, hasEmptyDouble, video3d } = features;
+
+  const emptyAmount = emptyMoreTwo ? 2 : emptyMoreOne ? 1 : null;
+
   if (nowTime.getDate() !== today.getDate()) {
-    const octal = parseInt('00');
     nowTime.setDate(today.getDate());
-    nowTime.setHours(octal, octal, octal);
+    nowTime.setHours(0, 0, 0);
   }
 
   nowTime.toISOString();
@@ -51,13 +53,16 @@ export async function getMovieSeances(params) {
     const movieTheaterQuery = MovieTheater.find();
     const seancesQuery = Seance.find({ date: { $lte: today, $gte: nowTime }, movieName: movieId }).sort('date');
 
+    video3d && seancesQuery.where({ 'format.video': '3D' });
+
     if (movieTheaterId) {
       const [movieTheater] = await movieTheaterQuery.where({ _id: movieTheaterId });
       const seances = await seancesQuery.where({ hallId: { $in: movieTheater.halls } }).populate('hallId');
 
       if (seances.length) {
         const theater = Object.assign(movieTheater);
-        theater.seances = seances;
+
+        theater.seances = filterSeancesByFeatures(seances, emptyAmount, hasEmptyVip, hasEmptyDouble);
         theaters.push(theater);
       }
     } else {
@@ -73,7 +78,7 @@ export async function getMovieSeances(params) {
           }
         });
         const customTheater = Object.assign(theater);
-        customTheater.seances = seances;
+        customTheater.seances = filterSeancesByFeatures(seances, emptyAmount, hasEmptyVip, hasEmptyDouble);
 
         return customTheater;
       });
@@ -180,7 +185,7 @@ export async function getSeance(params) {
 }
 
 export async function toBlockSeat(params) {
-  const { seanceId, seat, row, userId } = params;
+  const { seanceId, seat, row } = params;
 
   try {
     const blockedSeat = await BlockedSeats.findOne({ seanceId, seat, row });
@@ -272,52 +277,56 @@ export async function compareOrder(params) {
 }
 
 export async function getUserProfile(user) {
-  const userQuery = User.findById(user._id)
-    .populate({
-      path: 'tickets.seanceId',
-      populate: { path: 'movieName hallId', populate: { path: 'movieTheaterId', populate: { path: 'city' } } },
-    })
-    .select('tickets features -_id');
-  const userInfo = await userQuery;
+  try {
+    const userQuery = User.findById(user._id)
+      .populate({
+        path: 'tickets.seanceId',
+        populate: { path: 'movieName hallId', populate: { path: 'movieTheaterId', populate: { path: 'city' } } },
+      })
+      .select('tickets features -_id');
+    const userInfo = await userQuery;
 
-  const uniqSeances = new Set();
-  userInfo.tickets.forEach(ticket => uniqSeances.add(ticket.seanceId));
-  const grouped = [...uniqSeances].map(seance => {
-    let newSeance = {
-      date: seance.date,
-      format: seance.format,
-      hallName: seance.hallName,
-      movieInfo: {
-        name: seance.movieName.name,
-        poster: seance.movieName.poster,
-      },
-      movieTheaterInfo: {
-        name: seance.hallId.movieTheaterId.cinemaName,
-        adress: seance.hallId.movieTheaterId.adress,
-        city: seance.hallId.movieTheaterId.city.city,
-      },
-      tickets: [],
-      features: [],
+    const uniqSeances = new Set();
+    userInfo.tickets.forEach(ticket => uniqSeances.add(ticket.seanceId));
+    const grouped = [...uniqSeances].map(seance => {
+      let newSeance = {
+        date: seance.date,
+        format: seance.format,
+        hallName: seance.hallName,
+        movieInfo: {
+          name: seance.movieName.name,
+          poster: seance.movieName.poster,
+        },
+        movieTheaterInfo: {
+          name: seance.hallId.movieTheaterId.cinemaName,
+          adress: seance.hallId.movieTheaterId.adress,
+          city: seance.hallId.movieTheaterId.city.city,
+        },
+        tickets: [],
+        features: [],
+      };
+
+      newSeance.tickets = userInfo.tickets
+        .filter(ticket => ticket.seanceId._id === seance._id)
+        .map(({ buyingTime, price, rowNumber, seatNumber, seatType }) => {
+          return { buyingTime, price, rowNumber, seatNumber, seatType };
+        });
+      newSeance.features = userInfo.features
+        .filter(feature => feature.seanceId.toString() === seance._id.toString())
+        .map(({ products }) => {
+          return { products };
+        });
+      return newSeance;
+    });
+    return {
+      userName: user.nickName,
+      email: user.email,
+      registredAt: user.registredAt,
+      orders: grouped,
+      bought: user.tickets.length,
+      lastPurchase: user.tickets.length ? user.tickets[user.tickets.length - 1].buyingTime : null,
     };
-
-    newSeance.tickets = userInfo.tickets
-      .filter(ticket => ticket.seanceId._id === seance._id)
-      .map(({ buyingTime, price, rowNumber, seatNumber, seatType }) => {
-        return { buyingTime, price, rowNumber, seatNumber, seatType };
-      });
-    newSeance.features = userInfo.features
-      .filter(feature => feature.seanceId.toString() === seance._id.toString())
-      .map(({ products }) => {
-        return { products };
-      });
-    return newSeance;
-  });
-  return {
-    userName: user.nickName,
-    email: user.email,
-    registredAt: user.registredAt,
-    orders: grouped,
-    bought: user.tickets.length,
-    lastPurchase: user.tickets[user.tickets.length - 1].buyingTime,
-  };
+  } catch (error) {
+    return { success: false, messge: messages.USER_PROFILE_FAILED };
+  }
 }
