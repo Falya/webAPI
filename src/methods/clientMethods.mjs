@@ -116,9 +116,21 @@ export async function getOptionsForFilters(params) {
   week.setDate(week.getDate() + 7);
 
   try {
+    const movie = await Movie.findById(movieId);
+    const movieStartDate = new Date(movie.startDate);
+    movieStartDate.setHours(0, 0, 0);
+
+    const dates = Seance.find();
+
+    if (movieStartDate > today) {
+      week.setMonth(movieStartDate.getMonth(), movieStartDate.getDate() + 7);
+      dates.where({ date: { $lte: week, $gte: movieStartDate } });
+    } else {
+      dates.where({ date: { $lte: week, $gte: today } });
+    }
+
     const cities = City.find();
     const movieTheaters = MovieTheater.find();
-    const dates = Seance.find({ date: { $lte: week, $gte: today } });
 
     if (cityId) {
       movieTheaters.where({ city: cityId });
