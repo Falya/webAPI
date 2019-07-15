@@ -13,11 +13,11 @@ const userSchema = new Schema({
     unique: true,
   },
   password: String,
-  boughtSeats: [
+  tickets: [
     {
       rowNumber: Number,
       seatNumber: Number,
-      seance: {
+      seanceId: {
         type: Schema.Types.ObjectId,
         ref: 'seances',
       },
@@ -25,6 +25,20 @@ const userSchema = new Schema({
         type: Date,
         default: Date.now,
       },
+    },
+  ],
+  features: [
+    {
+      seanceId: {
+        type: Schema.Types.ObjectId,
+        ref: 'seances',
+      },
+      products: [
+        {
+          product: String,
+          amount: Number,
+        },
+      ],
     },
   ],
 });

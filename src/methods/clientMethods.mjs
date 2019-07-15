@@ -3,6 +3,7 @@ import Movie from '../models/Movie.mjs';
 import City from '../models/City.mjs';
 import Seance from '../models/Seance.mjs';
 import BlockedSeats from '../models/BlockedSeats.mjs';
+import User from '../models/User.mjs';
 import messages from '../namedMessages/namedMessages.mjs';
 
 export async function getMovie(id) {
@@ -146,8 +147,8 @@ export async function getSeance(params) {
   let blockedSeatsByUser = [];
   if (userId) {
     blockedSeatsByUser = await blockedSeatsQuery.where({ userId }).sort('expireAt');
-    console.log(blockedSeatsByUser);
   }
+
   return {
     seance,
     cinemaInfo: movieTheater,
@@ -183,5 +184,64 @@ export async function unBlockSeat(params) {
   } catch (error) {
     console.error(error);
     return { success: false, message: messages.UNBLOCK_SEAT_FAILED };
+  }
+}
+
+export async function compareOrder(params) {
+  const { orderTickets, orderFeatures, userId } = params;
+
+  const blockedSeatsId = orderTickets.map(({ _id }) => _id);
+
+  try {
+    const deleteSeats = BlockedSeats.deleteMany({ _id: { $in: blockedSeatsId } });
+
+    const soldSeats = orderTickets.map(({ row, seat, userId }) => {
+      return {
+        userId,
+        rowNumber: row,
+        seatNumber: seat,
+      };
+    });
+
+    const seanceId = orderTickets[0].seanceId;
+    const updateSeance = Seance.findById(seanceId).updateOne({ $push: { soldSeats } });
+
+    const userSeats = orderTickets.map(({ row, seat, seanceId }) => {
+      return {
+        seanceId,
+        rowNumber: row,
+        seatNumber: seat,
+      };
+    });
+
+    const updateUser = User.findById(userId).update({ $push: { tickets: userSeats } });
+    let userFeatures = {};
+
+    if (orderFeatures.length) {
+      userFeatures = {
+        seanceId,
+        products: orderFeatures.map(feature => {
+          return {
+            product: feature.product,
+            amount: feature.amount,
+          };
+        }),
+      };
+
+      updateUser.update({ $push: { features: userFeatures } });
+    }
+
+    await Promise.all([deleteSeats, updateSeance, updateUser]);
+
+    return {
+      success: true,
+      message: messages.PAYMENT_TICKETS_SUCCESS,
+      order: {
+        tickets: userSeats,
+        features: userFeatures,
+      },
+    };
+  } catch (error) {
+    return { success: false, message: messages.PAYMENT_TICKETS_FAILED };
   }
 }
