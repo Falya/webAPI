@@ -138,8 +138,6 @@ router.post('/payment', passport.authenticate('jwt', { session: false }), async 
           idempotency_key: idempotencyKey,
         }
       );
-      console.log('charge:');
-      console.log(JSON.stringify(charge));
     } else {
       throw Error(`Unrecognized Stripe token type: "${stripeTokenType}"`);
     }

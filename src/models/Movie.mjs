@@ -11,6 +11,7 @@ const movieSchema = new Schema({
   description: String,
   language: String,
   poster: String,
+  trailer: String,
 });
 
 const Movie = mongoose.model('movies', movieSchema);
