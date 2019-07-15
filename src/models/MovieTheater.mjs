@@ -11,7 +11,7 @@ const movieTheaterSchema = new Schema({
     ref: 'cities',
     required: true,
   },
-  adress: {
+  address: {
     type: String,
     required: true,
   },
