@@ -154,7 +154,7 @@ export async function getSeance(params) {
 }
 
 export async function toBlockSeat(params) {
-  const { seanceId, seat, row, userId } = params;
+  const { seanceId, seat, row } = params;
 
   try {
     const blockedSeat = await BlockedSeats.findOne({ seanceId, seat, row });
