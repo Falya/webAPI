@@ -1,6 +1,5 @@
 import express from 'express';
 import passport from 'passport';
-import Movie from '../models/Movie.mjs';
 import { addMovieTheater, addSeance } from '../methods/adminMethods.mjs';
 import { getMovieSeances, getMovie, getOptionsForFilters, getSeance } from '../methods/clientMethods.mjs';
 import { seance, hall } from '../../forTest/testTheater.mjs';
@@ -13,7 +12,7 @@ import { compareOrder } from '../methods/clientMethods.mjs';
 import dotenv from 'dotenv';
 import { getUserProfile } from '../methods/clientMethods.mjs';
 import messages from '../namedMessages/namedMessages.mjs';
-import { getCurrentMovies } from '../methods/clientMethods.mjs';
+import { getMovies } from '../methods/clientMethods.mjs';
 
 dotenv.config();
 
@@ -36,7 +35,7 @@ router.get('/getusername', passport.authenticate('jwt', { session: false }), asy
 });
 
 router.get('/movies', (req, res) => {
-  getCurrentMovies()
+  getMovies()
     .then(result => res.json(result))
     .catch(err => console.error(err));
 });

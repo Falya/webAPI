@@ -12,18 +12,35 @@ export async function getMovie(id) {
   return movie;
 }
 
-export async function getCurrentMovies() {
+export async function getMovies() {
   const currentDate = new Date();
   currentDate.setHours(0, 0, 0);
 
   try {
-    const movies = await Movie.find().where({ startDate: { $lte: currentDate }, endDate: { $gte: currentDate } });
+    const currentMovies = await Movie.find().where({
+      startDate: { $lte: currentDate },
+      endDate: { $gte: currentDate },
+    });
 
-    if (movies) {
-      return movies;
+    const featureMovies = await Movie.find().where({
+      startDate: { $gt: currentDate },
+      endDate: { $gt: currentDate },
+    });
+
+    let movies = {
+      currentMovies: [],
+      featureMovies: [],
+    };
+
+    if (currentMovies) {
+      movies.currentMovies = currentMovies;
     }
 
-    return [];
+    if (featureMovies) {
+      movies.featureMovies = featureMovies;
+    }
+
+    return { ...movies };
   } catch (error) {
     console.error(error);
   }
