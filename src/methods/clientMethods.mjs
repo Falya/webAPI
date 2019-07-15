@@ -219,7 +219,7 @@ export async function toBlockSeat(params) {
 
     const newBlockedSeat = new BlockedSeats({ ...params });
     await newBlockedSeat.save();
-    return { success: false, message: messages.BLOCK_SEAT_SUCCESS };
+    return { success: true, message: messages.BLOCK_SEAT_SUCCESS };
   } catch (error) {
     console.log(error);
     return { success: false, message: messages.BLOCK_SEAT_FAILED };

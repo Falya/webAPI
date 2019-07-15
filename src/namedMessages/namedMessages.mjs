@@ -1,7 +1,7 @@
 const messages = {
-  BLOCK_SEAT_SUCCESS: 'seat is already blocked',
+  BLOCK_SEAT_SUCCESS: 'seat is blocked by you',
   BLOCK_SEAT_FAILED: 'seat is not blocked',
-  BLOCK_SEAT_ALREADY_BLOCKED: 'seat is already blocked',
+  BLOCK_SEAT_ALREADY_BLOCKED: 'seat is already blocked by another user',
 
   UNBLOCK_SEAT_SUCCESS: 'seat is unblocked',
   UNBLOCK_SEAT_FAILED: 'seat is not unblocked',

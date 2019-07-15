@@ -20,7 +20,7 @@ passport.use(
       }
       return done(null, false, { message: messages.JWT_AUTHORIZE_INCORRECT_PASSWORD });
     } catch (error) {
-      done(error, false, { message: messages.JWT_UNAUTHORIZED });
+      return done(error, false, { message: messages.JWT_UNAUTHORIZED });
     }
   })
 );
