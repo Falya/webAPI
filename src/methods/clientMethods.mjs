@@ -311,6 +311,7 @@ export async function getUserProfile(user) {
     const userInfo = await userQuery;
 
     const uniqueSeances = new Set();
+
     userInfo.tickets.forEach(ticket => uniqueSeances.add(ticket.seanceId));
     const grouped = [...uniqueSeances].map(seance => {
       let newSeance = {
