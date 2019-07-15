@@ -2,6 +2,8 @@ import MovieTheater from '../models/MovieTheater.mjs';
 import Movie from '../models/Movie.mjs';
 import City from '../models/City.mjs';
 import Seance from '../models/Seance.mjs';
+import BlockedSeats from '../models/BlockedSeats.mjs';
+import messages from '../namedMessages/namedMessages.mjs';
 
 export async function getMovie(id) {
   const movie = await Movie.findById(id);
@@ -14,14 +16,11 @@ export async function getMovieSeances(params) {
   const today = new Date(date);
 
   if (nowTime.getDate() !== today.getDate()) {
-    const octal = parseInt('00');
     nowTime.setDate(today.getDate());
-    nowTime.setHours(octal, octal, octal);
+    nowTime.setHours(0, 0, 0);
   }
 
-  nowTime.toISOString();
   today.setHours(23, 59);
-  today.toISOString();
   let theaters = [];
 
   try {
@@ -67,13 +66,11 @@ export async function getMovieSeances(params) {
 
 export async function getOptionsForFilters(params) {
   const { cityId, movieId, movieTheaterId } = params;
-  const today = new Date().toISOString();
+  const today = new Date();
   const week = new Date();
-  const octal = parseInt('00');
 
-  week.setHours(octal);
+  week.setHours(0);
   week.setDate(week.getDate() + 7);
-  week.toISOString();
 
   try {
     const cities = City.find();
@@ -137,17 +134,54 @@ export async function getOptionsForFilters(params) {
 }
 
 export async function getSeance(params) {
-  const { seanceId } = params;
+  const { seanceId, userId } = params;
   const seance = await Seance.findById(seanceId);
   const movieTheater = await MovieTheater.findOne(
     { 'halls._id': seance.hallId },
     { halls: { $elemMatch: { _id: seance.hallId } } }
   ).select('-seances');
-  console.log('seance', seance);
-  console.log('movieTheater', movieTheater);
-
+  const nowTime = new Date();
+  const blockedSeatsQuery = BlockedSeats.find({ seanceId }).where({ expireAt: { $gte: nowTime } });
+  const blockedSeats = await blockedSeatsQuery;
+  let blockedSeatsByUser = [];
+  if (userId) {
+    blockedSeatsByUser = await blockedSeatsQuery.where({ userId }).sort('expireAt');
+    console.log(blockedSeatsByUser);
+  }
   return {
     seance,
     cinemaInfo: movieTheater,
+    blockedSeats,
+    blockedSeatsByUser,
   };
+}
+
+export async function toBlockSeat(params) {
+  const { seanceId, seat, row, userId } = params;
+
+  try {
+    const blockedSeat = await BlockedSeats.findOne({ seanceId, seat, row });
+    if (blockedSeat) {
+      return { success: false, message: messages.BLOCK_SEAT_ALREADY_BLOCKED };
+    }
+
+    const newBlockedSeat = new BlockedSeats({ ...params });
+    await newBlockedSeat.save();
+    return { success: false, message: messages.BLOCK_SEAT_SUCCESS };
+  } catch (error) {
+    console.log(error);
+    return { success: false, message: messages.BLOCK_SEAT_FAILED };
+  }
+}
+
+export async function unBlockSeat(params) {
+  const { seatId, userId } = params;
+  try {
+    await BlockedSeats.findOne({ _id: seatId, userId }).remove();
+
+    return { success: true, message: messages.UNBLOCK_SEAT_SUCCESS };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: messages.UNBLOCK_SEAT_FAILED };
+  }
 }

@@ -23,7 +23,7 @@ const userSchema = new Schema({
       },
       buyingTime: {
         type: Date,
-        default: Date.now(),
+        default: Date.now,
       },
     },
   ],

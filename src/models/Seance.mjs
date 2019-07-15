@@ -39,22 +39,6 @@ const seanceSchema = new Schema({
       seatNumber: Number,
     },
   ],
-  blockedSeats: [
-    {
-      rowNumber: Number,
-      seatNumber: Number,
-      customer: {
-        type: Schema.Types.ObjectId,
-        ref: 'users',
-      },
-      createAt: {
-        type: Date,
-        default: Date.now(),
-        required: true,
-        expires: '15m',
-      },
-    },
-  ],
 });
 
 seanceSchema.post('save', function(seance, next) {
