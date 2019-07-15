@@ -281,9 +281,9 @@ export async function getUserProfile(user) {
       .select('tickets features -_id');
     const userInfo = await userQuery;
 
-    const uniqSeances = new Set();
-    userInfo.tickets.forEach(ticket => uniqSeances.add(ticket.seanceId));
-    const grouped = [...uniqSeances].map(seance => {
+    const uniqueSeances = new Set();
+    userInfo.tickets.forEach(ticket => uniqueSeances.add(ticket.seanceId));
+    const grouped = [...uniqueSeances].map(seance => {
       let newSeance = {
         date: seance.date,
         format: seance.format,
@@ -294,7 +294,7 @@ export async function getUserProfile(user) {
         },
         movieTheaterInfo: {
           name: seance.hallId.movieTheaterId.cinemaName,
-          adress: seance.hallId.movieTheaterId.adress,
+          address: seance.hallId.movieTheaterId.address,
           city: seance.hallId.movieTheaterId.city.city,
         },
         tickets: [],
