@@ -2,21 +2,32 @@ import MovieTheater from '../models/MovieTheater.mjs';
 import City from '../models/City.mjs';
 import Seance from '../models/Seance.mjs';
 import Movie from '../models/Movie.mjs';
+import Hall from '../models/Hall.mjs';
 
 /**
  *
  * @param {Object} data
  */
-export function addMovieTheater(data) {
-  return City.findOne({ city: data.city })
-    .then(cityId => {
-      return new MovieTheater({
-        ...data,
-        city: cityId,
-      });
-    })
-    .then(theater => theater.save())
-    .catch(err => handleError(err));
+export async function addMovieTheater(data) {
+  try {
+    const newHall = new Hall({
+      ...data,
+    });
+
+    return await newHall.save();
+  } catch (error) {
+    console.log(error);
+  }
+
+  //   return MovieTheater.findOne({ city: data.city })
+  //     .then(cityId => {
+  //       return new MovieTheater({
+  //         ...data,
+  //         city: cityId,
+  //       });
+  //     })
+  //     .then(theater => theater.save())
+  //     .catch(err => handleError(err));
 }
 
 function handleError(err) {

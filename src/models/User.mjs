@@ -13,10 +13,16 @@ const userSchema = new Schema({
     unique: true,
   },
   password: String,
+  registredAt: {
+    type: Date,
+    default: Date.now(),
+  },
   tickets: [
     {
       rowNumber: Number,
       seatNumber: Number,
+      price: Number,
+      seatType: String,
       seanceId: {
         type: Schema.Types.ObjectId,
         ref: 'seances',

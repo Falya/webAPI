@@ -30,8 +30,7 @@ export async function getMovieSeances(params) {
 
     if (movieTheaterId) {
       const [movieTheater] = await movieTheaterQuery.where({ _id: movieTheaterId });
-      const halls = movieTheater.halls.map(hall => hall._id);
-      const seances = await seancesQuery.where({ hallId: { $in: halls } });
+      const seances = await seancesQuery.where({ hallId: { $in: movieTheater.halls } }).populate('hallId');
 
       if (seances.length) {
         const theater = Object.assign(movieTheater);
@@ -39,13 +38,13 @@ export async function getMovieSeances(params) {
         theaters.push(theater);
       }
     } else {
-      const allSeances = await seancesQuery;
+      const allSeances = await seancesQuery.populate('hallId');
       const movieTheaters = await movieTheaterQuery.where({ city });
 
       const filteredTheaters = movieTheaters.map(theater => {
         const seances = allSeances.filter(seance => {
           for (let i = 0; i < theater.halls.length; i++) {
-            if (seance.hallId.toString() === theater.halls[i]._id.toString()) {
+            if (seance.hallId._id.toString() === theater.halls[i].toString()) {
               return true;
             }
           }
@@ -87,18 +86,17 @@ export async function getOptionsForFilters(params) {
 
     if (movieTheaterId) {
       const [theater] = await MovieTheater.where({ _id: movieTheaterId });
-      const halls = theater.halls.map(hall => hall._id);
-      dates.where({ movieName: movieId, hallId: { $in: halls } });
+      dates.where({ movieName: movieId, hallId: { $in: theater.halls } });
     } else {
       const cinemas = await movieTheaters;
 
       const halls = cinemas.reduce((acc, theater) => {
-        const theaterHalls = theater.halls.map(hall => hall._id);
+        const theaterHalls = theater.halls;
         acc = [...acc, ...theaterHalls];
         return acc;
       }, []);
 
-      dates.where({ movieName: movieId, hallId: { $in: halls } });
+      dates.where({ movieName: movieId, hallId: { $in: halls } }).populate('hallId');
     }
 
     const movies = Movie.find().select('_id name');
@@ -136,11 +134,8 @@ export async function getOptionsForFilters(params) {
 
 export async function getSeance(params) {
   const { seanceId, userId } = params;
-  const seance = await Seance.findById(seanceId);
-  const movieTheater = await MovieTheater.findOne(
-    { 'halls._id': seance.hallId },
-    { halls: { $elemMatch: { _id: seance.hallId } } }
-  ).select('-seances');
+  const seance = await Seance.findById(seanceId).populate('hallId');
+  const movieTheater = await MovieTheater.findOne({ halls: seance.hallId }).select('-seances -halls');
   const nowTime = new Date();
   const blockedSeatsQuery = BlockedSeats.find({ seanceId }).where({ expireAt: { $gte: nowTime } });
   const blockedSeats = await blockedSeatsQuery;
@@ -148,6 +143,7 @@ export async function getSeance(params) {
   if (userId) {
     blockedSeatsByUser = await blockedSeatsQuery.where({ userId }).sort('expireAt');
   }
+  movieTheater.halls = [seance.hallId];
 
   return {
     seance,
@@ -158,7 +154,7 @@ export async function getSeance(params) {
 }
 
 export async function toBlockSeat(params) {
-  const { seanceId, seat, row, userId } = params;
+  const { seanceId, seat, row } = params;
 
   try {
     const blockedSeat = await BlockedSeats.findOne({ seanceId, seat, row });
@@ -206,11 +202,13 @@ export async function compareOrder(params) {
     const seanceId = orderTickets[0].seanceId;
     const updateSeance = Seance.findById(seanceId).updateOne({ $push: { soldSeats } });
 
-    const userSeats = orderTickets.map(({ row, seat, seanceId }) => {
+    const userSeats = orderTickets.map(({ row, seat, seanceId, seatType, price }) => {
       return {
         seanceId,
         rowNumber: row,
         seatNumber: seat,
+        seatType,
+        price,
       };
     });
 
@@ -242,6 +240,59 @@ export async function compareOrder(params) {
       },
     };
   } catch (error) {
+    console.error(error);
     return { success: false, message: messages.PAYMENT_TICKETS_FAILED };
   }
+}
+
+export async function getUserProfile(user) {
+  const userQuery = User.findById(user._id)
+    .populate({
+      path: 'tickets.seanceId',
+      populate: { path: 'movieName hallId', populate: { path: 'movieTheaterId', populate: { path: 'city' } } },
+    })
+    .select('tickets features -_id');
+  const userInfo = await userQuery;
+
+  const uniqueSeances = new Set();
+
+  userInfo.tickets.forEach(ticket => uniqueSeances.add(ticket.seanceId));
+  const grouped = [...uniqueSeances].map(seance => {
+    let newSeance = {
+      date: seance.date,
+      format: seance.format,
+      hallName: seance.hallName,
+      movieInfo: {
+        name: seance.movieName.name,
+        poster: seance.movieName.poster,
+      },
+      movieTheaterInfo: {
+        name: seance.hallId.movieTheaterId.cinemaName,
+        address: seance.hallId.movieTheaterId.address,
+        city: seance.hallId.movieTheaterId.city.city,
+      },
+      tickets: [],
+      features: [],
+    };
+
+    newSeance.tickets = userInfo.tickets
+      .filter(ticket => ticket.seanceId._id === seance._id)
+      .map(({ buyingTime, price, rowNumber, seatNumber, seatType }) => {
+        return { buyingTime, price, rowNumber, seatNumber, seatType };
+      });
+    newSeance.features = userInfo.features
+      .filter(feature => feature.seanceId.toString() === seance._id.toString())
+      .map(({ products }) => {
+        return { products };
+      });
+    return newSeance;
+  });
+  return {
+    userName: user.nickName,
+    email: user.email,
+    registredAt: user.registredAt,
+    orders: grouped,
+    bought: user.tickets.length,
+    lastPurchase: user.tickets[user.tickets.length - 1].buyingTime,
+  };
 }

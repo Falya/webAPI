@@ -1,42 +1,30 @@
-export const theater = {
-  cinemaName: 'Salut',
-  city: 'Minsk',
-  adress: 'Rokossovski str. 150a',
-  halls: [
+export const hall = {
+  hallName: 'Hall 2',
+  movieTheaterId: '5cf4f047db586fdb90685b35',
+  rows: [
     {
-      hallName: 'Hall 1',
-      rows: [
-        {
-          rowNumber: 1,
-          rowLength: 20,
-          rowType: 'simple',
-        },
-        {
-          rowNumber: 2,
-          rowLength: 20,
-          rowType: 'simple',
-        },
-        {
-          rowNumber: 3,
-          rowLength: 20,
-          rowType: 'simple',
-        },
-      ],
+      rowNumber: 1,
+      rowLength: 20,
+      rowType: 'simple',
+      price: 10,
     },
     {
-      hallName: 'Hall 2',
-      rows: [
-        {
-          rowNumber: 1,
-          rowLength: 20,
-          rowType: 'simple',
-        },
-        {
-          rowNumber: 2,
-          rowLength: 10,
-          rowType: 'double',
-        },
-      ],
+      rowNumber: 2,
+      rowLength: 20,
+      rowType: 'simple',
+      price: 10,
+    },
+    {
+      rowNumber: 3,
+      rowLength: 10,
+      rowType: 'double',
+      price: 20,
+    },
+    {
+      rowNumber: 4,
+      rowLength: 4,
+      rowType: 'vip',
+      price: 30,
     },
   ],
 };

@@ -3,7 +3,7 @@ import passport from 'passport';
 import Movie from '../models/Movie.mjs';
 import { addMovieTheater, addSeance } from '../methods/adminMethods.mjs';
 import { getMovieSeances, getMovie, getOptionsForFilters, getSeance } from '../methods/clientMethods.mjs';
-import { seance, theater } from '../../forTest/testTheater.mjs';
+import { seance, hall } from '../../forTest/testTheater.mjs';
 import * as authService from '../services/auth.mjs';
 import { toBlockSeat } from '../methods/clientMethods.mjs';
 import { unBlockSeat } from '../methods/clientMethods.mjs';
@@ -11,6 +11,7 @@ import uuidv4 from 'uuid/v4.js';
 import stripeApp from 'stripe';
 import { compareOrder } from '../methods/clientMethods.mjs';
 import dotenv from 'dotenv';
+import { getUserProfile } from '../methods/clientMethods.mjs';
 import messages from '../namedMessages/namedMessages.mjs';
 
 dotenv.config();
@@ -95,17 +96,9 @@ router.post('/seance/unblock-seat', passport.authenticate('jwt', { session: fals
   unBlockSeat(params).then(result => res.json(result));
 });
 
-/**Some querys for create testing */
-router.get('/test-create/theater', (req, res) => {
-  addMovieTheater(theater)
-    .then(result => res.send(result))
-    .catch(err => console.log(err));
-});
-
-router.get('/test-create/seance', (req, res) => {
-  addSeance(seance)
-    .then(result => res.send(result))
-    .catch(err => console.log(err));
+router.get('/user', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  const result = await getUserProfile(req.user);
+  res.json(result);
 });
 
 router.post('/payment', passport.authenticate('jwt', { session: false }), async (req, res) => {
@@ -167,6 +160,19 @@ router.post('/payment', passport.authenticate('jwt', { session: false }), async 
   }
 
   res.json({ error, status });
+});
+
+/**Some querys for create testing */
+router.get('/test-create/theater', (req, res) => {
+  addMovieTheater(hall)
+    .then(result => res.send(result))
+    .catch(err => console.log(err));
+});
+
+router.get('/test-create/seance', (req, res) => {
+  addSeance(seance)
+    .then(result => res.send(result))
+    .catch(err => console.log(err));
 });
 
 export default router;

@@ -1,30 +1,6 @@
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
-const hallSchema = new Schema({
-  hallName: {
-    type: String,
-    required: true,
-  },
-  rows: [
-    {
-      rowNumber: {
-        type: Number,
-        required: true,
-      },
-      rowLength: {
-        type: Number,
-        required: true,
-      },
-      rowType: {
-        type: String,
-        enum: ['simple', 'double', 'vip'],
-      },
-      price: Number,
-    },
-  ],
-});
-
 const movieTheaterSchema = new Schema({
   cinemaName: {
     type: String,
@@ -35,14 +11,14 @@ const movieTheaterSchema = new Schema({
     ref: 'cities',
     required: true,
   },
-  adress: {
+  address: {
     type: String,
     required: true,
   },
   halls: [
     {
-      type: hallSchema,
-      index: true,
+      type: Schema.Types.ObjectId,
+      ref: 'halls',
     },
   ],
   seances: [
