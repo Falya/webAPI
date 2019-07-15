@@ -17,14 +17,11 @@ export async function getMovieSeances(params) {
   const today = new Date(date);
 
   if (nowTime.getDate() !== today.getDate()) {
-    const octal = parseInt('00');
     nowTime.setDate(today.getDate());
-    nowTime.setHours(octal, octal, octal);
+    nowTime.setHours(0, 0, 0);
   }
 
-  nowTime.toISOString();
   today.setHours(23, 59);
-  today.toISOString();
   let theaters = [];
 
   try {
@@ -69,13 +66,11 @@ export async function getMovieSeances(params) {
 
 export async function getOptionsForFilters(params) {
   const { cityId, movieId, movieTheaterId } = params;
-  const today = new Date().toISOString();
+  const today = new Date();
   const week = new Date();
-  const octal = parseInt('00');
 
-  week.setHours(octal);
+  week.setHours(0);
   week.setDate(week.getDate() + 7);
-  week.toISOString();
 
   try {
     const cities = City.find();
@@ -142,7 +137,6 @@ export async function getSeance(params) {
   const seance = await Seance.findById(seanceId).populate('hallId');
   const movieTheater = await MovieTheater.findOne({ halls: seance.hallId }).select('-seances -halls');
   const nowTime = new Date();
-  nowTime.toISOString();
   const blockedSeatsQuery = BlockedSeats.find({ seanceId }).where({ expireAt: { $gte: nowTime } });
   const blockedSeats = await blockedSeatsQuery;
   let blockedSeatsByUser = [];
