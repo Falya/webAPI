@@ -1,52 +1,54 @@
 export function filterSeancesByFeatures(seances, emptyAmount, hasEmptyVip, hasEmptyDouble) {
-  let filteredSeances = seances;
+  let filterList = [];
+  emptyAmount && filterList.push(emptySeatsFilter);
+  hasEmptyVip && filterList.push(emptyVipFilter);
+  hasEmptyDouble && filterList.push(emptyDoubleFilter);
 
-  if (emptyAmount) {
-    filteredSeances = seances.filter(seance => {
-      const emptySeats =
-        seance.hallId.rows.reduce((sum, row) => {
+  return filterList.reduce((acc, filter) => {
+    acc = filter(acc, emptyAmount);
+    return acc;
+  }, seances);
+}
+
+function emptyVipFilter(seances, emptyAmount) {
+  return seances.filter(seance => {
+    let soldSeats = [];
+    const emptySeats =
+      seance.hallId.rows.reduce((sum, row) => {
+        if (row.rowType === 'vip') {
           sum += row.rowLength;
-          return sum;
-        }, 0) - seance.soldSeats.length;
-      console.log('emptySeats: ', emptySeats);
-      return emptySeats > emptyAmount;
-    });
-  }
-  if (hasEmptyVip || hasEmptyDouble) {
-    let typeFiltered = [];
-    if (hasEmptyVip) {
-      typeFiltered = seances.filter(seance => {
-        let soldSeats = [];
-        const emptySeats =
-          seance.hallId.rows.reduce((sum, row) => {
-            if (row.rowType === 'vip') {
-              sum += row.rowLength;
-              const currentRow = seance.soldSeats.filter(({ rowNumber }) => rowNumber === row.rowNumber);
-              soldSeats = [...soldSeats, ...currentRow];
-            }
-            return sum;
-          }, 0) - soldSeats.length;
-        return emptyAmount ? emptySeats > emptyAmount : emptySeats > 0;
-      });
-    }
+          const currentRow = seance.soldSeats.filter(({ rowNumber }) => rowNumber === row.rowNumber);
+          soldSeats = [...soldSeats, ...currentRow];
+        }
+        return sum;
+      }, 0) - soldSeats.length;
+    return emptySeats > emptyAmount;
+  });
+}
 
-    if (hasEmptyDouble) {
-      typeFiltered = seances.filter(seance => {
-        let soldSeats = [];
-        const emptySeats =
-          seance.hallId.rows.reduce((sum, row) => {
-            if (row.rowType === 'double') {
-              sum += row.rowLength;
-              const currentRow = seance.soldSeats.filter(({ rowNumber }) => rowNumber === row.rowNumber);
-              soldSeats = [...soldSeats, ...currentRow];
-            }
-            return sum;
-          }, 0) - soldSeats.length;
-        return emptyAmount ? emptySeats > emptyAmount : emptySeats > 0;
-      });
-    }
+function emptyDoubleFilter(seances, emptyAmount) {
+  return seances.filter(seance => {
+    let soldSeats = [];
+    const emptySeats =
+      seance.hallId.rows.reduce((sum, row) => {
+        if (row.rowType === 'double') {
+          sum += row.rowLength;
+          const currentRow = seance.soldSeats.filter(({ rowNumber }) => rowNumber === row.rowNumber);
+          soldSeats = [...soldSeats, ...currentRow];
+        }
+        return sum;
+      }, 0) - soldSeats.length;
+    return emptySeats > emptyAmount;
+  });
+}
 
-    filteredSeances = typeFiltered;
-  }
-  return filteredSeances;
+function emptySeatsFilter(seances, emptyAmount) {
+  return seances.filter(seance => {
+    const emptySeats =
+      seance.hallId.rows.reduce((sum, row) => {
+        sum += row.rowLength;
+        return sum;
+      }, 0) - seance.soldSeats.length;
+    return emptySeats > emptyAmount;
+  });
 }

@@ -51,9 +51,9 @@ export async function getMovieSeances(params) {
   const nowTime = new Date();
   const today = new Date(date);
 
-  const { emptyMoreOne, emptyMoreTwo, hasEmptyVip, hasEmptyDouble, video3d } = features;
+  const { hasEmptyMoreOne, hasEmptyMoreTwo, hasEmptyVip, hasEmptyDouble, hasVideo3d } = features;
 
-  const emptyAmount = emptyMoreTwo ? 2 : emptyMoreOne ? 1 : null;
+  const emptyAmount = hasEmptyMoreTwo ? 2 : hasEmptyMoreOne ? 1 : 0;
 
   if (nowTime.getDate() !== today.getDate()) {
     nowTime.setDate(today.getDate());
@@ -68,7 +68,7 @@ export async function getMovieSeances(params) {
     const movieTheaterQuery = MovieTheater.find();
     const seancesQuery = Seance.find({ date: { $lte: today, $gte: nowTime }, movieName: movieId }).sort('date');
 
-    video3d && seancesQuery.where({ 'format.video': '3D' });
+    hasVideo3d && seancesQuery.where({ 'format.video': '3D' });
 
     if (movieTheaterId) {
       const [movieTheater] = await movieTheaterQuery.where({ _id: movieTheaterId });
@@ -351,6 +351,6 @@ export async function getUserProfile(user) {
       lastPurchase: user.tickets.length ? user.tickets[user.tickets.length - 1].buyingTime : null,
     };
   } catch (error) {
-    return { success: false, messge: messages.USER_PROFILE_FAILED };
+    return { success: false };
   }
 }
