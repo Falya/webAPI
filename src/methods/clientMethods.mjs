@@ -35,7 +35,7 @@ export async function getMovieSeances(params) {
   const nowTime = new Date();
   const today = new Date(date);
 
-  const { hasVideo3d } = features;
+  const { is3d } = features;
   const filterSeances = filterSeancesByFeatures(features);
 
   if (nowTime.getDate() !== today.getDate()) {
@@ -51,7 +51,7 @@ export async function getMovieSeances(params) {
     const movieTheaterQuery = MovieTheater.find();
     const seancesQuery = Seance.find({ date: { $lte: today, $gte: nowTime }, movieName: movieId }).sort('date');
 
-    video3dFilter(hasVideo3d, seancesQuery);
+    video3dFilter(is3d, seancesQuery);
 
     if (movieTheaterId) {
       const [movieTheater] = await movieTheaterQuery.where({ _id: movieTheaterId });
