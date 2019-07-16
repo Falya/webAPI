@@ -6,6 +6,7 @@ import BlockedSeats from '../models/BlockedSeats.mjs';
 import User from '../models/User.mjs';
 import messages from '../namedMessages/namedMessages.mjs';
 import { filterSeancesByFeatures } from '../utils/utils.mjs';
+import { video3dFilter } from '../utils/utils.mjs';
 
 export async function getMovie(id) {
   const movie = await Movie.findById(id);
@@ -51,9 +52,8 @@ export async function getMovieSeances(params) {
   const nowTime = new Date();
   const today = new Date(date);
 
-  const { hasEmptyMoreOne, hasEmptyMoreTwo, hasEmptyVip, hasEmptyDouble, hasVideo3d } = features;
-
-  const emptyAmount = hasEmptyMoreTwo ? 2 : hasEmptyMoreOne ? 1 : 0;
+  const { is3d } = features;
+  const filterSeances = filterSeancesByFeatures(features);
 
   if (nowTime.getDate() !== today.getDate()) {
     nowTime.setDate(today.getDate());
@@ -68,7 +68,7 @@ export async function getMovieSeances(params) {
     const movieTheaterQuery = MovieTheater.find();
     const seancesQuery = Seance.find({ date: { $lte: today, $gte: nowTime }, movieName: movieId }).sort('date');
 
-    hasVideo3d && seancesQuery.where({ 'format.video': '3D' });
+    video3dFilter(is3d, seancesQuery);
 
     if (movieTheaterId) {
       const [movieTheater] = await movieTheaterQuery.where({ _id: movieTheaterId });
@@ -77,7 +77,7 @@ export async function getMovieSeances(params) {
       if (seances.length) {
         const theater = Object.assign(movieTheater);
 
-        theater.seances = filterSeancesByFeatures(seances, emptyAmount, hasEmptyVip, hasEmptyDouble);
+        theater.seances = filterSeances(seances);
         theaters.push(theater);
       }
     } else {
@@ -93,7 +93,7 @@ export async function getMovieSeances(params) {
           }
         });
         const customTheater = Object.assign(theater);
-        customTheater.seances = filterSeancesByFeatures(seances, emptyAmount, hasEmptyVip, hasEmptyDouble);
+        customTheater.seances = filterSeances(seances);
 
         return customTheater;
       });
@@ -333,14 +333,16 @@ export async function getUserProfile(user) {
 
       newSeance.tickets = userInfo.tickets
         .filter(ticket => ticket.seanceId._id === seance._id)
-        .map(({ buyingTime, price, rowNumber, seatNumber, seatType }) => {
-          return { buyingTime, price, rowNumber, seatNumber, seatType };
-        });
+        .map(({ buyingTime, price, rowNumber, seatNumber, seatType }) => ({
+          buyingTime,
+          price,
+          rowNumber,
+          seatNumber,
+          seatType,
+        }));
       newSeance.features = userInfo.features
         .filter(feature => feature.seanceId.toString() === seance._id.toString())
-        .map(({ products }) => {
-          return { products };
-        });
+        .map(({ products }) => ({ products }));
       return newSeance;
     });
     return {
