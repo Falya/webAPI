@@ -13,6 +13,7 @@ import dotenv from 'dotenv';
 import { getUserProfile } from '../methods/clientMethods.mjs';
 import messages from '../namedMessages/namedMessages.mjs';
 import { getMovies } from '../methods/clientMethods.mjs';
+import { userRegistrationMiddleware } from '../middlewares/middlewares.mjs';
 
 dotenv.config();
 
@@ -25,7 +26,7 @@ router.post('/login', async (req, res) => {
   res.json(response);
 });
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', userRegistrationMiddleware, async (req, res) => {
   const response = await authService.signup(req.body);
   res.json(response);
 });

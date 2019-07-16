@@ -7,12 +7,17 @@ const userSchema = new Schema({
   nickName: {
     type: String,
     unique: true,
+    required: true,
   },
   email: {
     type: String,
     unique: true,
+    required: true,
   },
-  password: String,
+  password: {
+    type: String,
+    required: true,
+  },
   registredAt: {
     type: Date,
     default: Date.now(),
