@@ -209,12 +209,16 @@ export async function getSeance(params) {
 }
 
 export async function toBlockSeat(params) {
-  const { seanceId, seat, row } = params;
+  const { seanceId, seat, row, userId } = params;
 
   try {
     const blockedSeat = await BlockedSeats.findOne({ seanceId, seat, row });
+    const blockedByUser = await BlockedSeats.find({ userId });
     if (blockedSeat) {
       return { success: false, message: messages.BLOCK_SEAT_ALREADY_BLOCKED };
+    }
+    if (blockedByUser && blockedByUser.length >= 5) {
+      return { success: false, message: messages.BLOCK_SEAT_USER_LIMIT };
     }
 
     const newBlockedSeat = new BlockedSeats({ ...params });

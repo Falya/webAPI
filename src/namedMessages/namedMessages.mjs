@@ -1,10 +1,11 @@
 const messages = {
-  BLOCK_SEAT_SUCCESS: 'seat is blocked by you',
-  BLOCK_SEAT_FAILED: 'seat is not blocked',
-  BLOCK_SEAT_ALREADY_BLOCKED: 'seat is already blocked by another user',
+  BLOCK_SEAT_SUCCESS: 'Seat is blocked by you',
+  BLOCK_SEAT_FAILED: 'Seat is not blocked',
+  BLOCK_SEAT_ALREADY_BLOCKED: 'Seat is already blocked by another user',
+  BLOCK_SEAT_USER_LIMIT: 'You can book no more than 5 seats',
 
-  UNBLOCK_SEAT_SUCCESS: 'seat is unblocked',
-  UNBLOCK_SEAT_FAILED: 'seat is not unblocked',
+  UNBLOCK_SEAT_SUCCESS: 'Seat is unblocked',
+  UNBLOCK_SEAT_FAILED: 'Seat is not unblocked',
 
   LOGIN_NO_FOUND_USER: 'No user found.',
   LOGIN_WRONG_PASSWORD: 'Oops! Wrong password.',
