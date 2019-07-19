@@ -1,8 +1,6 @@
 import express from 'express';
 import passport from 'passport';
-import { addMovieTheater, addSeance } from '../methods/adminMethods.mjs';
 import { getMovieSeances, getMovie, getOptionsForFilters, getSeance } from '../methods/clientMethods.mjs';
-import { seance, hall } from '../../forTest/testTheater.mjs';
 import * as authService from '../services/auth.mjs';
 import { toBlockSeat } from '../methods/clientMethods.mjs';
 import { unBlockSeat } from '../methods/clientMethods.mjs';
@@ -156,19 +154,6 @@ router.post('/payment', passport.authenticate('jwt', { session: false }), async 
   }
 
   res.json({ error, status });
-});
-
-/**Some querys for create testing */
-router.get('/test-create/theater', (req, res) => {
-  addMovieTheater(hall)
-    .then(result => res.send(result))
-    .catch(err => console.log(err));
-});
-
-router.get('/test-create/seance', (req, res) => {
-  addSeance(seance)
-    .then(result => res.send(result))
-    .catch(err => console.log(err));
 });
 
 export default router;

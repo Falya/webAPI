@@ -61,3 +61,32 @@ export const signup = async payload => {
     return { success: false, message: messages.SIGNUP_FAILED };
   }
 };
+
+export const adminLogin = async payload => {
+  const { nickName, password } = payload;
+
+  try {
+    if (nickName && password) {
+      const user = await User.findOne({ nickName: nickName });
+
+      if (!user) {
+        return { message: messages.LOGIN_NO_FOUND_USER };
+      }
+
+      const validate = await user.validatePassword(password);
+
+      if (!validate) {
+        return { message: messages.LOGIN_WRONG_PASSWORD };
+      }
+
+      if (!user.isAdmin()) {
+        return { message: messages.NOT_ADMIN };
+      }
+
+      return generateToken(user.id);
+    }
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: messages.LOGIN_FAILED };
+  }
+};

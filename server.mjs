@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import './src/config/passport/index.mjs';
 import api from './src/routes/api.mjs';
+import admin from './src/routes/admin.mjs';
 
 dotenv.config();
 
@@ -28,3 +29,4 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(morgan('dev'));
 app.use('/api', api);
+app.use('/api/admin', admin);

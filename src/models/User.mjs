@@ -18,6 +18,11 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
   registredAt: {
     type: Date,
     default: Date.now(),
@@ -79,6 +84,10 @@ userSchema.methods.validatePassword = async function(password) {
     });
   });
   return comparedPassword;
+};
+
+userSchema.methods.isAdmin = function() {
+  return this.role === 'admin';
 };
 
 const User = mongoose.model('users', userSchema);

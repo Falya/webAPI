@@ -7,19 +7,17 @@ export function userRegistrationMiddleware(req, res, next) {
       success: false,
       message: 'The minimum length of the nickName must be 3.',
     });
-  }
-  if (!password || password.length < 6) {
+  } else if (!password || password.length < 6) {
     res.send({
       success: false,
       message: 'The minimum length of the password must be 6.',
     });
-  }
-  if (!email || !email.match(emailRegExp)) {
+  } else if (!email || !email.match(emailRegExp)) {
     res.send({
       success: false,
-      message: 'You entered iтмфдшв email',
+      message: 'You entered incorrect email',
     });
+  } else {
+    next();
   }
-
-  next();
 }

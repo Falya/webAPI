@@ -20,6 +20,8 @@ const messages = {
   PAYMENT_FAILED: 'Failed payment',
   PAYMENT_TICKETS_SUCCESS: 'Tickets added to user',
   PAYMENT_TICKETS_FAILED: 'Tickets hasn`t been add',
+
+  NOT_ADMIN: 'You are not Admin!',
 };
 
 export default messages;
