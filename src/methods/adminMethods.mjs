@@ -46,6 +46,33 @@ export async function getGenres() {
   return genres;
 }
 
+export async function getCities() {
+  const cities = await City.find()
+    .select('-_id')
+    .sort('city');
+
+  return cities;
+}
+
+export async function addCity(data) {
+  try {
+    const newCity = new City({
+      ...data,
+    });
+    await newCity.save();
+
+    return {
+      success: true,
+      message: messages.ADD_CITY_SUCCESS,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: messages.ADD_CITY_FAILED,
+    };
+  }
+}
+
 export async function addMovieTheater(data) {
   try {
     const newHall = new Hall({

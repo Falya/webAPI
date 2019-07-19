@@ -26,6 +26,9 @@ const messages = {
   ADD_MOVIE_ALREADY: 'This movie already exists.',
   ADD_MOVIE_SUCCESS: 'Movie successfully added.',
   ADD_MOVIE_FAILED: 'The movie hasn`t been added. Something was wrong.',
+
+  ADD_CITY_SUCCESS: 'City successfully added.',
+  ADD_CITY_FAILED: 'The city hasn`t been added. This city is already exist.',
 };
 
 export default messages;

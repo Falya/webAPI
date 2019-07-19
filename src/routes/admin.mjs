@@ -1,11 +1,10 @@
 import express from 'express';
 import passport from 'passport';
 import dotenv from 'dotenv';
-import { addMovieTheater, addSeance, getGenres } from '../methods/adminMethods.mjs';
-import { seance, hall } from '../../forTest/testTheater.mjs';
+import { getGenres, getCities } from '../methods/adminMethods.mjs';
 import * as authService from '../services/auth.mjs';
 import { adminInsertMiddleware } from '../middlewares/middlewares.mjs';
-import { addMovie } from '../methods/adminMethods.mjs';
+import { addMovie, addCity } from '../methods/adminMethods.mjs';
 dotenv.config();
 
 const router = express.Router();
@@ -31,10 +30,17 @@ router.post('/add-movie', passport.authenticate('jwt', { session: false }), (req
     .catch(err => console.log(err));
 });
 
-router.get('/test-create/seance', (req, res) => {
-  addSeance(seance)
-    .then(result => res.send(result))
-    .catch(err => console.log(err));
-});
+router
+  .route('/cities')
+  .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
+    getCities()
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  })
+  .post(passport.authenticate('jwt', { session: false }), async (req, res) => {
+    addCity(req.body)
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  });
 
 export default router;
