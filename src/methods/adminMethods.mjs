@@ -3,11 +3,49 @@ import City from '../models/City.mjs';
 import Seance from '../models/Seance.mjs';
 import Movie from '../models/Movie.mjs';
 import Hall from '../models/Hall.mjs';
+import messages from '../namedMessages/namedMessages.mjs';
+import Genre from '../models/Genre.mjs';
 
 /**
  *
  * @param {Object} data
  */
+export async function addMovie(data) {
+  try {
+    const isMovie = await Movie.findOne({ name: data.name });
+    if (isMovie) {
+      return {
+        success: false,
+        message: messages.ADD_MOVIE_ALREADY,
+      };
+    }
+
+    const newMovie = new Movie({
+      ...data,
+    });
+    await newMovie.save();
+
+    return {
+      success: true,
+      message: messages.ADD_MOVIE_SUCCESS,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: messages.ADD_MOVIE_FAILED,
+      error,
+    };
+  }
+}
+
+export async function getGenres() {
+  const genres = await Genre.find()
+    .select('-_id')
+    .sort('name');
+
+  return genres;
+}
+
 export async function addMovieTheater(data) {
   try {
     const newHall = new Hall({

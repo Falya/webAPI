@@ -21,3 +21,20 @@ export function userRegistrationMiddleware(req, res, next) {
     next();
   }
 }
+
+export function adminInsertMiddleware(req, res, next) {
+  if (Object.keys(req.body).length) {
+    const isFieldsFilled = Object.values(req.body).every(field => !!field);
+
+    if (!isFieldsFilled) {
+      res.send({
+        success: false,
+        message: 'Not all fields are filled.',
+      });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+}

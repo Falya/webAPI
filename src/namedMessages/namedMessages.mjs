@@ -22,6 +22,10 @@ const messages = {
   PAYMENT_TICKETS_FAILED: 'Tickets hasn`t been add',
 
   NOT_ADMIN: 'You are not Admin!',
+
+  ADD_MOVIE_ALREADY: 'This movie already exists.',
+  ADD_MOVIE_SUCCESS: 'Movie successfully added.',
+  ADD_MOVIE_FAILED: 'The movie hasn`t been added. Something was wrong.',
 };
 
 export default messages;
