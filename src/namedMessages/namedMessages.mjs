@@ -29,6 +29,12 @@ const messages = {
 
   ADD_CITY_SUCCESS: 'City successfully added.',
   ADD_CITY_FAILED: 'The city hasn`t been added. This city is already exist.',
+
+  ADD_THEATER_SUCCESS: 'Theater successfully added.',
+  ADD_THEATER_FAILED: 'The theater hasn`t been added. This theater is already exist.',
+
+  ADD_FEATURE_SUCCESS: 'Product successfully added.',
+  ADD_FEATURE_FAILED: 'The theater hasn`t been added. This product is already exist.',
 };
 
 export default messages;

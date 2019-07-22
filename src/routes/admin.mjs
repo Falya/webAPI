@@ -5,6 +5,8 @@ import { getGenres, getCities } from '../methods/adminMethods.mjs';
 import * as authService from '../services/auth.mjs';
 import { adminInsertMiddleware } from '../middlewares/middlewares.mjs';
 import { addMovie, addCity } from '../methods/adminMethods.mjs';
+import { getTheaters, getTheater } from '../methods/adminMethods.mjs';
+import { addMovieTheater, addFeature } from '../methods/adminMethods.mjs';
 dotenv.config();
 
 const router = express.Router();
@@ -42,5 +44,29 @@ router
       .then(result => res.send(result))
       .catch(err => console.log(err));
   });
+
+router
+  .route('/theaters')
+  .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
+    getTheaters(req.query)
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  })
+  .post(passport.authenticate('jwt', { session: false }), async (req, res) => {
+    addMovieTheater(req.body)
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  });
+
+router.get('/theaters/theater', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  getTheater(req.query)
+    .then(result => res.send(result))
+    .catch(err => console.log(err));
+});
+router.post('/theaters/feature', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  addFeature(req.body)
+    .then(result => res.send(result))
+    .catch(err => console.log(err));
+});
 
 export default router;
