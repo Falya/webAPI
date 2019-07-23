@@ -34,7 +34,13 @@ const messages = {
   ADD_THEATER_FAILED: 'The theater hasn`t been added. This theater is already exist.',
 
   ADD_FEATURE_SUCCESS: 'Product successfully added.',
-  ADD_FEATURE_FAILED: 'The theater hasn`t been added. This product is already exist.',
+  ADD_FEATURE_FAILED: 'The product hasn`t been added. This product is already exist.',
+
+  ADD_HALL_SUCCESS: 'Hall successfully added.',
+  ADD_HALL_FAILED: 'The hall hasn`t been added. This hall is already exist.',
+
+  ADD_SEANCE_SUCCESS: 'Seance successfully added.',
+  ADD_SEANCE_FAILED: 'The seance hasn`t been added. Seance on this time is already exist.',
 };
 
 export default messages;

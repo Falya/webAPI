@@ -138,49 +138,117 @@ export async function addFeature(params) {
   }
 }
 
-// export async function addMovieTheater(data) {
-//   try {
-//     const newHall = new Hall({
-//       ...data,
-//     });
+export async function addHall(params) {
+  const { movieTheaterId, hallName } = params;
+  try {
+    const theater = await MovieTheater.findById(movieTheaterId)
+      .populate('halls')
+      .select('halls');
 
-//     return await newHall.save();
-//   } catch (error) {
-//     console.log(error);
-//   }
+    const isDuplicate = theater.halls.some(hall => hall.hallName === hallName);
 
-//   return MovieTheater.findOne({ city: data.city })
-//     .then(cityId => {
-//       return new MovieTheater({
-//         ...data,
-//         city: cityId,
-//       });
-//     })
-//     .then(theater => theater.save())
-//     .catch(err => handleError(err));
-// }
+    if (isDuplicate) {
+      return {
+        success: false,
+        message: messages.ADD_HALL_FAILED,
+      };
+    }
+
+    const newHall = new Hall(params);
+
+    await newHall.save();
+    return {
+      success: true,
+      message: messages.ADD_HALL_SUCCESS,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      message: messages.ADD_HALL_FAILED,
+    };
+  }
+}
+
+export async function getSeances(params) {
+  const { hallId, date } = params;
+  const startDate = new Date(date);
+  const endDate = new Date(date);
+  startDate.setHours(0, 0, 0);
+  endDate.setHours(23, 59, 59);
+
+  try {
+    const seances = await Seance.find()
+      .where({ hallId, date: { $gte: startDate, $lte: endDate } })
+      .populate('movieName')
+      .select('date movieName');
+    console.log('seances', seances);
+    return seances;
+  } catch (error) {
+    return [];
+  }
+}
+
+export async function addSeance(params) {
+  const { hallId, movieName, date } = params;
+  const startDate = new Date(date);
+  const endDate = new Date(date);
+  try {
+    const { duration } = await Movie.findById(movieName);
+    startDate.setMinutes(startDate.getMinutes() - duration);
+    endDate.setMinutes(endDate.getMinutes() + duration);
+
+    const existSeances = await Seance.find().where({ hallId, date: { $gte: startDate, $lte: endDate } });
+
+    if (existSeances.length) {
+      return {
+        success: false,
+        message: messages.ADD_SEANCE_FAILED,
+      };
+    }
+
+    const { hallName } = await Hall.findById(hallId);
+
+    const newSeance = new Seance({
+      ...params,
+      hallName,
+    });
+
+    await newSeance.save();
+
+    return {
+      success: true,
+      message: messages.ADD_SEANCE_SUCCESS,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: messages.ADD_SEANCE_FAILED,
+    };
+  }
+}
 
 function handleError(err) {
   console.log(err);
 }
 
-export async function addSeance(data) {
-  try {
-    const movie = await Movie.findOne({ name: data.movieName });
-    const cinema = await MovieTheater.findOne({ cinemaName: data.cinema.name });
+// export async function addSeance(data) {
+//   try {
+//     const movie = await Movie.findOne({ name: data.movieName });
+//     const cinema = await MovieTheater.findOne({ cinemaName: data.cinema.name });
 
-    const [{ id: hallId }] = cinema.halls.filter(hall => hall.hallName === data.cinema.hall);
+//     const [{ id: hallId }] = cinema.halls.filter(hall => hall.hallName === data.cinema.hall);
 
-    const newSeance = new Seance({
-      movieName: movie.id,
-      hallId,
-      hallName: data.cinema.hall,
-      date: data.date,
-    });
+//     const newSeance = new Seance({
+//       movieName: movie.id,
+//       hallId,
+//       hallName: data.cinema.hall,
+//       date: data.date,
+//     });
 
-    const seance = await newSeance.save();
-    return seance;
-  } catch (error) {
-    handleError(error);
-  }
-}
+//     const seance = await newSeance.save();
+//     return seance;
+//   } catch (error) {
+//     handleError(error);
+//   }
+// }

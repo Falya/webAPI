@@ -10,22 +10,32 @@ const hallSchema = new Schema({
   movieTheaterId: {
     type: Schema.Types.ObjectId,
     ref: 'movieTheaters',
+    required: true,
   },
   rows: [
     {
       rowNumber: {
         type: Number,
         required: true,
+        unique: true,
       },
       rowLength: {
         type: Number,
         required: true,
+        min: [1, 'Minimal row length is 1'],
+        max: [20, 'Maximum row length is 20'],
       },
       rowType: {
         type: String,
         enum: ['simple', 'double', 'vip'],
+        required: true,
       },
-      price: Number,
+      price: {
+        type: Number,
+        required: true,
+        min: [5, 'Minimal price is 5'],
+        max: [50, 'Maximum price is 50'],
+      },
     },
   ],
 });
