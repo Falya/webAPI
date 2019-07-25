@@ -80,7 +80,10 @@ router.post('/seance/to-block-seat', passport.authenticate('jwt', { session: fal
     ...req.body,
     userId: req.user._id,
   };
-  toBlockSeat(params).then(result => res.json(result));
+  toBlockSeat(params).then(result => {
+    req.io.emit('seat_satus_changed', 'Ok');
+    return res.json(result);
+  });
 });
 
 router.post('/seance/unblock-seat', passport.authenticate('jwt', { session: false }), async (req, res) => {
@@ -89,7 +92,10 @@ router.post('/seance/unblock-seat', passport.authenticate('jwt', { session: fals
     userId: req.user._id,
   };
 
-  unBlockSeat(params).then(result => res.json(result));
+  unBlockSeat(params).then(result => {
+    req.io.emit('seat_satus_changed', 'Ok');
+    return res.json(result);
+  });
 });
 
 router.get('/user', passport.authenticate('jwt', { session: false }), async (req, res) => {
