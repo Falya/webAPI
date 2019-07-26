@@ -25,7 +25,6 @@ const seanceSchema = new Schema({
     },
     sound: {
       type: String,
-      enum: ['Dolby Digital'],
       default: 'Dolby Digital',
     },
   },

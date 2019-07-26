@@ -1,11 +1,16 @@
 import express from 'express';
 import passport from 'passport';
 import dotenv from 'dotenv';
-import { addMovieTheater, addSeance, getGenres } from '../methods/adminMethods.mjs';
-import { seance, hall } from '../../forTest/testTheater.mjs';
+import { getGenres, getCities } from '../methods/adminMethods.mjs';
 import * as authService from '../services/auth.mjs';
 import { adminInsertMiddleware } from '../middlewares/middlewares.mjs';
-import { addMovie } from '../methods/adminMethods.mjs';
+import { addMovie, addCity } from '../methods/adminMethods.mjs';
+import { getTheaters, getTheater } from '../methods/adminMethods.mjs';
+import { addMovieTheater, addFeature } from '../methods/adminMethods.mjs';
+import { addHall } from '../methods/adminMethods.mjs';
+import { getMovies } from '../methods/clientMethods.mjs';
+import { getSeances } from '../methods/adminMethods.mjs';
+import { addSeance } from '../methods/adminMethods.mjs';
 dotenv.config();
 
 const router = express.Router();
@@ -31,10 +36,66 @@ router.post('/add-movie', passport.authenticate('jwt', { session: false }), (req
     .catch(err => console.log(err));
 });
 
-router.get('/test-create/seance', (req, res) => {
-  addSeance(seance)
+router
+  .route('/cities')
+  .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
+    getCities()
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  })
+  .post(passport.authenticate('jwt', { session: false }), async (req, res) => {
+    addCity(req.body)
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  });
+
+router
+  .route('/theaters')
+  .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
+    getTheaters(req.query)
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  })
+  .post(passport.authenticate('jwt', { session: false }), async (req, res) => {
+    addMovieTheater(req.body)
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  });
+
+router.get('/theaters/theater', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  getTheater(req.query)
     .then(result => res.send(result))
     .catch(err => console.log(err));
 });
+router.post('/theaters/feature', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  addFeature(req.body)
+    .then(result => res.send(result))
+    .catch(err => console.log(err));
+});
+
+router.post('/theaters/halls', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  addHall(req.body)
+    .then(result => res.send(result))
+    .catch(err => console.log(err));
+});
+
+router.get('/movies', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  getMovies()
+    .then(result => res.send(result))
+    .catch(err => console.log(err));
+});
+
+router
+  .route('/seances')
+  .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
+    getSeances(req.query)
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  })
+  .post(passport.authenticate('jwt', { session: false }), async (req, res) => {
+    addSeance(req.body)
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  });
 
 export default router;

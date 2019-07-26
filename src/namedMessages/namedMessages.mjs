@@ -26,6 +26,21 @@ const messages = {
   ADD_MOVIE_ALREADY: 'This movie already exists.',
   ADD_MOVIE_SUCCESS: 'Movie successfully added.',
   ADD_MOVIE_FAILED: 'The movie hasn`t been added. Something was wrong.',
+
+  ADD_CITY_SUCCESS: 'City successfully added.',
+  ADD_CITY_FAILED: 'The city hasn`t been added. This city is already exist.',
+
+  ADD_THEATER_SUCCESS: 'Theater successfully added.',
+  ADD_THEATER_FAILED: 'The theater hasn`t been added. This theater is already exist.',
+
+  ADD_FEATURE_SUCCESS: 'Product successfully added.',
+  ADD_FEATURE_FAILED: 'The product hasn`t been added. This product is already exist.',
+
+  ADD_HALL_SUCCESS: 'Hall successfully added.',
+  ADD_HALL_FAILED: 'The hall hasn`t been added. This hall is already exist.',
+
+  ADD_SEANCE_SUCCESS: 'Seance successfully added.',
+  ADD_SEANCE_FAILED: 'The seance hasn`t been added. Seance on this time is already exist.',
 };
 
 export default messages;
