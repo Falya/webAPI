@@ -13,18 +13,35 @@ export async function getMovie(id) {
   return movie;
 }
 
-export async function getCurrentMovies() {
+export async function getMovies() {
   const currentDate = new Date();
   currentDate.setHours(0, 0, 0);
 
   try {
-    const movies = await Movie.find().where({ startDate: { $lte: currentDate }, endDate: { $gte: currentDate } });
+    const currentMovies = await Movie.find().where({
+      startDate: { $lte: currentDate },
+      endDate: { $gte: currentDate },
+    });
 
-    if (movies) {
-      return movies;
+    const featureMovies = await Movie.find().where({
+      startDate: { $gt: currentDate },
+      endDate: { $gt: currentDate },
+    });
+
+    let movies = {
+      currentMovies: [],
+      featureMovies: [],
+    };
+
+    if (currentMovies) {
+      movies.currentMovies = currentMovies;
     }
 
-    return [];
+    if (featureMovies) {
+      movies.featureMovies = featureMovies;
+    }
+
+    return { ...movies };
   } catch (error) {
     console.error(error);
   }
@@ -99,9 +116,21 @@ export async function getOptionsForFilters(params) {
   week.setDate(week.getDate() + 7);
 
   try {
+    const movie = await Movie.findById(movieId);
+    const movieStartDate = new Date(movie.startDate);
+    movieStartDate.setHours(0, 0, 0);
+
+    const dates = Seance.find();
+
+    if (movieStartDate > today) {
+      week.setMonth(movieStartDate.getMonth(), movieStartDate.getDate() + 7);
+      dates.where({ date: { $lte: week, $gte: movieStartDate } });
+    } else {
+      dates.where({ date: { $lte: week, $gte: today } });
+    }
+
     const cities = City.find();
     const movieTheaters = MovieTheater.find();
-    const dates = Seance.find({ date: { $lte: week, $gte: today } });
 
     if (cityId) {
       movieTheaters.where({ city: cityId });
@@ -180,17 +209,21 @@ export async function getSeance(params) {
 }
 
 export async function toBlockSeat(params) {
-  const { seanceId, seat, row } = params;
+  const { seanceId, seat, row, userId } = params;
 
   try {
     const blockedSeat = await BlockedSeats.findOne({ seanceId, seat, row });
+    const blockedByUser = await BlockedSeats.find({ userId });
     if (blockedSeat) {
       return { success: false, message: messages.BLOCK_SEAT_ALREADY_BLOCKED };
+    }
+    if (blockedByUser && blockedByUser.length >= 5) {
+      return { success: false, message: messages.BLOCK_SEAT_USER_LIMIT };
     }
 
     const newBlockedSeat = new BlockedSeats({ ...params });
     await newBlockedSeat.save();
-    return { success: false, message: messages.BLOCK_SEAT_SUCCESS };
+    return { success: true, message: messages.BLOCK_SEAT_SUCCESS };
   } catch (error) {
     console.log(error);
     return { success: false, message: messages.BLOCK_SEAT_FAILED };

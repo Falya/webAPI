@@ -1,9 +1,6 @@
 import express from 'express';
 import passport from 'passport';
-import Movie from '../models/Movie.mjs';
-import { addMovieTheater, addSeance } from '../methods/adminMethods.mjs';
 import { getMovieSeances, getMovie, getOptionsForFilters, getSeance } from '../methods/clientMethods.mjs';
-import { seance, hall } from '../../forTest/testTheater.mjs';
 import * as authService from '../services/auth.mjs';
 import { toBlockSeat } from '../methods/clientMethods.mjs';
 import { unBlockSeat } from '../methods/clientMethods.mjs';
@@ -13,7 +10,8 @@ import { compareOrder } from '../methods/clientMethods.mjs';
 import dotenv from 'dotenv';
 import { getUserProfile } from '../methods/clientMethods.mjs';
 import messages from '../namedMessages/namedMessages.mjs';
-import { getCurrentMovies } from '../methods/clientMethods.mjs';
+import { getMovies } from '../methods/clientMethods.mjs';
+import { userRegistrationMiddleware } from '../middlewares/middlewares.mjs';
 
 dotenv.config();
 
@@ -26,7 +24,7 @@ router.post('/login', async (req, res) => {
   res.json(response);
 });
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', userRegistrationMiddleware, async (req, res) => {
   const response = await authService.signup(req.body);
   res.json(response);
 });
@@ -36,7 +34,7 @@ router.get('/getusername', passport.authenticate('jwt', { session: false }), asy
 });
 
 router.get('/movies', (req, res) => {
-  getCurrentMovies()
+  getMovies()
     .then(result => res.json(result))
     .catch(err => console.error(err));
 });
@@ -139,8 +137,6 @@ router.post('/payment', passport.authenticate('jwt', { session: false }), async 
           idempotency_key: idempotencyKey,
         }
       );
-      console.log('charge:');
-      console.log(JSON.stringify(charge));
     } else {
       throw Error(`Unrecognized Stripe token type: "${stripeTokenType}"`);
     }
@@ -158,19 +154,6 @@ router.post('/payment', passport.authenticate('jwt', { session: false }), async 
   }
 
   res.json({ error, status });
-});
-
-/**Some querys for create testing */
-router.get('/test-create/theater', (req, res) => {
-  addMovieTheater(hall)
-    .then(result => res.send(result))
-    .catch(err => console.log(err));
-});
-
-router.get('/test-create/seance', (req, res) => {
-  addSeance(seance)
-    .then(result => res.send(result))
-    .catch(err => console.log(err));
 });
 
 export default router;
