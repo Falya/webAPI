@@ -13,6 +13,7 @@ import { compareOrder } from '../methods/clientMethods.mjs';
 import dotenv from 'dotenv';
 import { getUserProfile } from '../methods/clientMethods.mjs';
 import messages from '../namedMessages/namedMessages.mjs';
+import { getCurrentMovies } from '../methods/clientMethods.mjs';
 
 dotenv.config();
 
@@ -35,12 +36,9 @@ router.get('/getusername', passport.authenticate('jwt', { session: false }), asy
 });
 
 router.get('/movies', (req, res) => {
-  Movie.find({}, (err, movies) => {
-    if (err) {
-      return console.log(err);
-    }
-    res.send(movies);
-  });
+  getCurrentMovies()
+    .then(result => res.json(result))
+    .catch(err => console.error(err));
 });
 
 router.get('/movies/movie/', (req, res) => {
@@ -49,8 +47,8 @@ router.get('/movies/movie/', (req, res) => {
     .catch(err => console.log(err));
 });
 
-router.get('/movies/movie/seances/', (req, res) => {
-  getMovieSeances(req.query)
+router.post('/movies/movie/seances/', (req, res) => {
+  getMovieSeances(req.body)
     .then(data => {
       res.send(data);
     })
