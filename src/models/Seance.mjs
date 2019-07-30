@@ -40,6 +40,7 @@ const seanceSchema = new Schema({
       },
       rowNumber: Number,
       seatNumber: Number,
+      seatPosition: Number,
     },
   ],
 });

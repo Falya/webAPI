@@ -16,6 +16,10 @@ const blockedSeatsSchema = new Schema({
     type: Number,
     required: true,
   },
+  seatPosition: {
+    type: Number,
+    required: true,
+  },
   price: Number,
   userId: {
     type: Schema.Types.ObjectId,

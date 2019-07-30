@@ -250,11 +250,12 @@ export async function compareOrder(params) {
   try {
     const deleteSeats = BlockedSeats.deleteMany({ _id: { $in: blockedSeatsId } });
 
-    const soldSeats = orderTickets.map(({ row, seat, userId }) => {
+    const soldSeats = orderTickets.map(({ row, seat, userId, seatPosition }) => {
       return {
         userId,
         rowNumber: row,
         seatNumber: seat,
+        seatPosition,
       };
     });
 

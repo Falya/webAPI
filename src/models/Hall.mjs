@@ -30,6 +30,7 @@ const hallSchema = new Schema({
         enum: ['simple', 'double', 'vip'],
         required: true,
       },
+      emptyPlaces: [Number],
       price: {
         type: Number,
         required: true,
