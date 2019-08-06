@@ -41,6 +41,9 @@ const messages = {
 
   ADD_SEANCE_SUCCESS: 'Seance successfully added.',
   ADD_SEANCE_FAILED: 'The seance hasn`t been added. Seance on this time is already exist.',
+
+  EDIT_MOVIE_SUCCESS: 'The movie successfully updated',
+  EDIT_MOVIE_FAILED: 'The movie hasn`t been updated',
 };
 
 export default messages;

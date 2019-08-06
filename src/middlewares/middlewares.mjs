@@ -24,7 +24,11 @@ export function userRegistrationMiddleware(req, res, next) {
 
 export function adminInsertMiddleware(req, res, next) {
   if (Object.keys(req.body).length) {
-    const isFieldsFilled = Object.values(req.body).every(field => !!field);
+    const isFieldsFilled = Object.values(req.body).every(field => {
+
+      return !!field.toString();
+
+    });
 
     if (!isFieldsFilled) {
       res.send({

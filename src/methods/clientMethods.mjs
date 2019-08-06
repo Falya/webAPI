@@ -21,11 +21,13 @@ export async function getMovies() {
     const currentMovies = await Movie.find().where({
       startDate: { $lte: currentDate },
       endDate: { $gte: currentDate },
+      isDraft: false,
     });
 
     const featureMovies = await Movie.find().where({
       startDate: { $gt: currentDate },
       endDate: { $gt: currentDate },
+      isDraft: false,
     });
 
     let movies = {

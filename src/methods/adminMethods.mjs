@@ -232,23 +232,29 @@ function handleError(err) {
   console.log(err);
 }
 
-// export async function addSeance(data) {
-//   try {
-//     const movie = await Movie.findOne({ name: data.movieName });
-//     const cinema = await MovieTheater.findOne({ cinemaName: data.cinema.name });
+export async function getDrafts() {
+  try {
+    const drafts = await Movie.find().where({isDraft: true});
 
-//     const [{ id: hallId }] = cinema.halls.filter(hall => hall.hallName === data.cinema.hall);
+    return drafts;
 
-//     const newSeance = new Seance({
-//       movieName: movie.id,
-//       hallId,
-//       hallName: data.cinema.hall,
-//       date: data.date,
-//     });
+  } catch (error) {
+    console.error(error);
+  }
+}
 
-//     const seance = await newSeance.save();
-//     return seance;
-//   } catch (error) {
-//     handleError(error);
-//   }
-// }
+export async function updateMovie(params) {
+  const {_id} = params;
+try {
+   await Movie.updateOne({_id}, {...params});
+   return {
+     success: true,
+     message: messages.EDIT_MOVIE_SUCCESS,
+    }
+} catch (error) {
+  return {
+    success: false,
+    message: messages.EDIT_MOVIE_FAILED,
+  }
+}
+}

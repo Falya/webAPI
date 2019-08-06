@@ -4,13 +4,14 @@ import dotenv from 'dotenv';
 import { getGenres, getCities } from '../methods/adminMethods.mjs';
 import * as authService from '../services/auth.mjs';
 import { adminInsertMiddleware } from '../middlewares/middlewares.mjs';
-import { addMovie, addCity } from '../methods/adminMethods.mjs';
+import { addMovie, addCity, updateMovie } from '../methods/adminMethods.mjs';
 import { getTheaters, getTheater } from '../methods/adminMethods.mjs';
 import { addMovieTheater, addFeature } from '../methods/adminMethods.mjs';
 import { addHall } from '../methods/adminMethods.mjs';
 import { getMovies } from '../methods/clientMethods.mjs';
 import { getSeances } from '../methods/adminMethods.mjs';
 import { addSeance } from '../methods/adminMethods.mjs';
+import { getDrafts } from '../methods/adminMethods.mjs';
 dotenv.config();
 
 const router = express.Router();
@@ -30,11 +31,19 @@ router.get('/genres', passport.authenticate('jwt', { session: false }), async (r
     .catch(err => console.log(err));
 });
 
-router.post('/add-movie', passport.authenticate('jwt', { session: false }), (req, res) => {
-  addMovie(req.body)
-    .then(result => res.send(result))
-    .catch(err => console.log(err));
-});
+router
+  .route('/add-movie')
+  .post(passport.authenticate('jwt', { session: false }), (req, res) => {
+    addMovie(req.body)
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  })
+  .put(passport.authenticate('jwt', { session: false }), (req, res) => {
+    updateMovie(req.body)
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  })
+
 
 router
   .route('/cities')
@@ -81,6 +90,12 @@ router.post('/theaters/halls', passport.authenticate('jwt', { session: false }),
 
 router.get('/movies', passport.authenticate('jwt', { session: false }), async (req, res) => {
   getMovies()
+    .then(result => res.send(result))
+    .catch(err => console.log(err));
+});
+
+router.get('/movies/drafts', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  getDrafts()
     .then(result => res.send(result))
     .catch(err => console.log(err));
 });

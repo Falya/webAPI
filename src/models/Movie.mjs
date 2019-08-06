@@ -32,7 +32,7 @@ const movieSchema = new Schema({
     },
   },
   age: {
-    type: String,
+    type: Number,
     required: [true, 'No movie`s age!'],
     min: 0,
     max: 21,
@@ -92,6 +92,10 @@ const movieSchema = new Schema({
       message: props => `${props.value} is not a valid trailer link!`,
     },
   },
+  isDraft: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 const Movie = mongoose.model('movies', movieSchema);
